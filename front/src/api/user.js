@@ -1,24 +1,84 @@
-import request from '@/utils/request'
+import axios from '@/libs/api.request'
 
-export function login(data) {
-  return request({
-    url: '/vue-admin-template/user/login',
-    method: 'post',
-    data
-  })
-}
-
-export function getInfo(token) {
-  return request({
-    url: '/vue-admin-template/user/info',
-    method: 'get',
-    params: { token }
-  })
-}
-
-export function logout() {
-  return request({
-    url: '/vue-admin-template/user/logout',
+export const login = ({ userName, password }) => {
+  const data = {
+    userName,
+    password
+  }
+  return axios.request({
+    url: 'login',
+    data,
     method: 'post'
+  })
+}
+
+export const getUserInfo = (token) => {
+  return axios.request({
+    url: 'get_info',
+    params: {
+      token
+    },
+    method: 'get'
+  })
+}
+
+export const logout = (token) => {
+  return axios.request({
+    url: 'logout',
+    method: 'post'
+  })
+}
+
+export const getUnreadCount = () => {
+  return axios.request({
+    url: 'message/count',
+    method: 'get'
+  })
+}
+
+export const getMessage = () => {
+  return axios.request({
+    url: 'message/init',
+    method: 'get'
+  })
+}
+
+export const getContentByMsgId = msg_id => {
+  return axios.request({
+    url: 'message/content',
+    method: 'get',
+    params: {
+      msg_id
+    }
+  })
+}
+
+export const hasRead = msg_id => {
+  return axios.request({
+    url: 'message/has_read',
+    method: 'post',
+    data: {
+      msg_id
+    }
+  })
+}
+
+export const removeReaded = msg_id => {
+  return axios.request({
+    url: 'message/remove_readed',
+    method: 'post',
+    data: {
+      msg_id
+    }
+  })
+}
+
+export const restoreTrash = msg_id => {
+  return axios.request({
+    url: 'message/restore',
+    method: 'post',
+    data: {
+      msg_id
+    }
   })
 }
