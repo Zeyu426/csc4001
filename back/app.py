@@ -29,6 +29,24 @@ def index():
 
 # api.add_resource(Hello, '/hello')
 
+@app.route('/login', methods = ['GET', 'POST'])
+def login():
+    data = request.get_json(silent=True)
+    username = data['username']
+    password = data['password']
+    return_data = get_login(username, password)
+    return make_response(jsonify(return_data))
+
+def get_login(username, password):
+    return_data = {
+        'status': False,
+        'role': ""
+    }
+
+    # SQL
+    return return_data
+
+
 @app.route('/hello_api', methods = ['GET', 'POST'])
 def hellp_api():
     data = request.get_json(silent=True)
