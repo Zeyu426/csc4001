@@ -56,6 +56,24 @@ export const constantRoutes = [
   },
 
   {
+    path: '/patient_list',
+    component: Layout,
+    redirect: '/dashboard',
+    children: [{
+      path: 'patient_list',
+      name: 'Patient_list',
+      component: () => import('@/views/patient_list'),
+      meta: { title: 'Patient List', icon: 'form' }
+    },
+    {
+      path: 'workbench',
+      name: 'Workbench',
+      component: () => import('@/views/workbench'),
+      meta: { title: 'Workbench', icon: 'form' }
+    }]
+  },
+
+  {
     path: '/example',
     component: Layout,
     redirect: '/example/table',
