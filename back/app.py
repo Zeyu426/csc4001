@@ -54,7 +54,7 @@ def get_login(username, password):
 
     cur.execute('select id, identity from Account where account = "%s" and password = "%s"'%(username, password))
     result = cur.fetchall()
-    if (result.length() == 1):
+    if (len(result) == 1):
         return_data['status'] = True
         return_data['id'] = result[0][0]
         return_data['role'] = result[0][1]
