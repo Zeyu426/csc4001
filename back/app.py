@@ -6,6 +6,7 @@ from flask import (abort, current_app, jsonify,
                    make_response, request, send_file)
 
 import csv
+import pymysql
 DATA_FILE = "./data.csv"
 
 app = Flask(__name__)
@@ -40,12 +41,27 @@ def login():
 def get_login(username, password):
     return_data = {
         'status': False,
+        'id': 0,
         'role': ""
     }
 
     # SQL
-    return return_data
+    conn = pymysql.connect(host = '182.61.17.45', 
+                       user = "csc4001",
+                       passwd = "123456", 
+                       database = "Hospital")
+    cur = conn.cursor()
 
+    cur.execute('select id, identity from Account where account = "%s" and password = "%s"'%(username, password))
+    result = cur.fetchall()
+    if (result.length() == 1):
+        return_data['status'] = True
+        return_data['id'] = result[0][0]
+        return_data['role'] = result[0][1]
+
+    cur.close()
+    conn.close()
+    return return_data
 
 @app.route('/hello_api', methods = ['GET', 'POST'])
 def hellp_api():
