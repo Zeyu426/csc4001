@@ -30,11 +30,36 @@ def index():
 
 # api.add_resource(Hello, '/hello')
 
+
+@app.route('/vue-admin-template/user/login', methods=['GET','POST'])
+def login_test():
+    data = request.get_json(silent=True)
+    return_data = {
+        "code": 20000,
+        "data": "admin-token",
+    }
+    return make_response(jsonify(return_data))
+
+@app.route('/vue-admin-template/user/info', methods=['GET','POST'])
+def test2():
+    data = request.get_json(silent=True)
+    return_data = {
+        'code': 20000,
+        'data': {
+            'roles': ['admin'],
+            'introduction': 'I am a super administrator',
+            'avatar': 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+            'name': 'Super Admin'
+        }
+    }
+    return make_response(jsonify(return_data))
+
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     data = request.get_json(silent=True)
     username = data['username']
     password = data['password']
+    print(username, password)
     return_data = get_login(username, password)
     return make_response(jsonify(return_data))
 
