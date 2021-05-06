@@ -6,7 +6,8 @@ const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: ''
+    avatar: '',
+    menus: ''
   }
 }
 
@@ -24,6 +25,9 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  },
+  SET_MENUS: (state, menus) => {
+    state.menus = menus
   }
 }
 
@@ -48,15 +52,36 @@ const actions = {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
         const { data } = response
-
+        
         if (!data) {
           return reject('Verification failed, please Login again.')
         }
 
         const { name, avatar } = data
 
+        const menus = [
+          {
+            'path': '/form',
+            'component': 'Layout',
+            'children': [
+              {
+                'path': 'index',
+                'name': 'Form',
+                'component': 'form/index',
+                'meta': { 'title': 'Form', 'icon': 'form' }
+              }
+            ]
+          }
+        ]
+
+        menus.push({
+          path: '*',
+          redirect: '/404',
+          hidden: true
+        })
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
+        commit('SET_MENUS', menus)
         resolve(data)
       }).catch(error => {
         reject(error)
