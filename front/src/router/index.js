@@ -74,6 +74,18 @@ export const constantRoutes = [
   },
 
   {
+    path: '/profile',
+    component: Layout,
+    redirect: '/dashboard',
+    children: [{
+      path: 'pro',
+      name: 'Profile',
+      component: () => import('@/views/profile'),
+      meta: { title: 'Profile', icon: 'dashboard' }
+    }]
+  },
+
+  {
     path: '/example',
     component: Layout,
     redirect: '/example/table',

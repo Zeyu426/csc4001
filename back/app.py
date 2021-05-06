@@ -18,6 +18,29 @@ api = Api(app)
 def index():
     return "Welcome to API v1, try /hello."
 
+@app.route('/test', methods=['GET','POST'])
+def test():
+    return_data = {
+        "code": 20000,
+        "data": "admin-token",
+    }
+    return make_response(jsonify(return_data))
+
+@app.route('/upload_image', methods=['GET','POST'])
+def upload_image():
+    name = request.form.get("name")
+    description = request.form.get("description")
+    fileObj = request.files.get("file")
+    print(name)
+    print(description)
+    print(fileObj)
+    print(fileObj.read())
+
+    return_data = {
+        "code": 20000,
+        "data": "admin-token",
+    }
+    return make_response(jsonify(return_data))
 
 # class Hello(Resource):
 #     @staticmethod

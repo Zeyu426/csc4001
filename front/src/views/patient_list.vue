@@ -46,8 +46,11 @@
 
       <el-table-column align="center" label="CT Imaging Diagnosis" width="200">
         <template slot-scope="scope">
-          <i class="el-icon-time" />
-          <span>{{ scope.row.display_time }}</span>
+          <!-- <i class="el-icon-time" />
+          <span>{{ scope.row.display_time }}</span> -->
+          <el-button type="primary" @click="handleClick(scope.row.id)">
+            Generate
+          </el-button>
         </template>
       </el-table-column>
 
@@ -74,21 +77,26 @@ export default {
       list: null,
       listLoading: true,
       table_data: [{'id': 1234, 'name': 'fugui', 'birthdate': '2020-01-01', 'gender': 'female', 'status': 'waiting'},
-                    {'id': 1234, 'name': 'fugui', 'birthdate': '2020-01-01', 'gender': 'female', 'status': 'finished'}]
+                    {'id': 2222, 'name': 'fugui', 'birthdate': '2020-01-01', 'gender': 'female', 'status': 'finished'}]
     }
   },
   created() {
     this.fetchData()
   },
   methods: {
+    handleClick(id) {
+      this.$router.push({name: 'Workbench', query: {conlltion: id}})
+    },
     fetchData() {
       this.listLoading = true
-      getList().then(response => {
+      this.list = this.table_data
+      this.listLoading = false
+      /* getList().then(response => {
         this.list = response.data.items
         this.list = this.table_data
         console.log(this.list)
         this.listLoading = false
-      })
+      }) */
 
       //
     }
