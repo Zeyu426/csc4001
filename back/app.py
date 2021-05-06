@@ -36,13 +36,16 @@ def login_test():
     data = request.get_json(silent=True)
     return_data = {
         "code": 20000,
-        "data": "admin-token",
+        "data": {
+            'token':"admin-token",
+        }
     }
     return make_response(jsonify(return_data))
 
 @app.route('/vue-admin-template/user/info', methods=['GET','POST'])
 def test2():
     data = request.get_json(silent=True)
+    print(data)
     return_data = {
         'code': 20000,
         'data': {
@@ -53,6 +56,16 @@ def test2():
         }
     }
     return make_response(jsonify(return_data))
+
+@app.route('/vue-admin-template/user/logout', methods=['GET','POST'])
+def test3():
+    data = request.get_json(silent=True)
+    return_data = {
+        'code': 20000,
+        'data': 'success'
+    }
+    return make_response(jsonify(return_data))
+
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
