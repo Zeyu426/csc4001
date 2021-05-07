@@ -7,7 +7,8 @@ const getDefaultState = () => {
     token: getToken(),
     name: '',
     avatar: '',
-    menus: ''
+    menus: '',
+    id: ''
   }
 }
 
@@ -28,6 +29,9 @@ const mutations = {
   },
   SET_MENUS: (state, menus) => {
     state.menus = menus
+  },
+  SET_ID: (state, id) => {
+    state.id = id
   }
 }
 
@@ -39,6 +43,7 @@ const actions = {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
         commit('SET_TOKEN', data.token)
+        commit('SET_ID', username)
         setToken(data.token)
         resolve()
       }).catch(error => {
