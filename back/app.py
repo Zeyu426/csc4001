@@ -246,11 +246,12 @@ def get_map_data(user_id):
     }'''
 @app.route('/get_CT_list', methods=['GET','POST'])
 def get_CT_list():
-    return_data= {
-        'code' = 20000,
-        'data' = {}
-    }
 
+    return_data= {
+        'code' : 20000,
+        'data' : {}
+    }
+    
     data = request.get_json(silent=True)
     radio_id = data['radio_id']
 
