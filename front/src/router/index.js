@@ -50,7 +50,7 @@ export const constantRoutes = [
     children: [{
       path: 'dashboard',
       name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
+      component: () => import('@/views/dashboard'),
       meta: { title: 'Dashboard', icon: 'dashboard' }
     }]
   },
@@ -59,6 +59,8 @@ export const constantRoutes = [
     path: '/patient_list',
     component: Layout,
     redirect: '/dashboard',
+    name: 'CT',
+    meta: { title: 'CT', icon: 'el-icon-s-help' },
     children: [{
       path: 'patient_list',
       name: 'Patient_list',
@@ -85,6 +87,32 @@ export const constantRoutes = [
     }]
   },
 
+  {
+    path: '/profile2',
+    component: Layout,
+    redirect: '/dashboard',
+    children: [{
+      path: 'pro2',
+      name: 'Profile2',
+      component: () => import('@/views/profile2'),
+      meta: { title: 'Profile2', icon: 'dashboard' }
+    }]
+  },
+
+  {
+    path: '/patient_list2',
+    component: Layout,
+    redirect: '/dashboard',
+    name: 'Main',
+    meta: { title: 'Main', icon: 'el-icon-s-help' },
+    children: [{
+      path: 'patient_list2',
+      name: 'Patient_list2',
+      component: () => import('@/views/patient_list2'),
+      meta: { title: 'Patient List 2', icon: 'form' }
+    }]
+  },
+  
   {
     path: '/role_management',
     component: Layout,

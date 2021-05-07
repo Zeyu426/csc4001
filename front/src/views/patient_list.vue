@@ -76,11 +76,14 @@ export default {
     return {
       list: null,
       listLoading: true,
+      doc_id: null,
       table_data: [{'id': 1234, 'name': 'fugui', 'birthdate': '2020-01-01', 'gender': 'female', 'status': 'waiting'},
-                    {'id': 2222, 'name': 'fugui', 'birthdate': '2020-01-01', 'gender': 'female', 'status': 'finished'}]
+                    {'id': 2222, 'name': 'fugui', 'birthdate': '2020-01-01', 'gender': 'female', 'status': 'finished'}],
     }
   },
   created() {
+    this.doc_id = this.$store.getters.id
+    console.log(this.doc_id)
     this.fetchData()
   },
   methods: {
