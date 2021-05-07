@@ -159,11 +159,18 @@ def hellp_api():
     }'''
 @app.route('/get_CT_list', methods=['GET','POST'])
 def get_CT_list():
+<<<<<<< HEAD
+
+    return_data= {
+        'code' : 20000,
+        'data' : {}
+=======
     return_data = {
         'code': 20000,
         'data': {}
+>>>>>>> 92a0aac0b711e63d5f080bd5378e91ae02c5d619
     }
-
+    
     data = request.get_json(silent=True)
     radio_id = data['radio_id']
 
