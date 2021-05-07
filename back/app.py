@@ -151,93 +151,6 @@ def hellp_api():
     }
     return make_response(jsonify(return_data))
 
-@app.route('/get_released_task', methods = ['GET', 'POST'])
-def get_released_task():
-    data = request.get_json(silent=True)
-    user_id = data['user_id']
-    return_data = get_released_task_data(user_id)
-    return make_response(jsonify(return_data))
-
-def get_released_task_data(user_id):
-    return_data = {
-        "data": []
-    }
-    with open(DATA_FILE) as f:
-        reader = csv.reader(f)
-        head_row=next(reader)
-        for row in reader:
-            if row[5] == user_id:
-                activity = {
-                    'title': row[1],
-                    'position': row[3],
-                    'status': row[7],
-                    'participant': row[6],
-                    'key_word': row[8]
-                }
-                return_data['data'].append(activity)
-    return return_data
-
-@app.route('/get_participated_task', methods = ['GET', 'POST'])
-def get_participated_task():
-    data = request.get_json(silent=True)
-    user_id = data['user_id']
-    return_data = get_participated_task_data(user_id)
-    return make_response(jsonify(return_data))
-
-def get_participated_task_data(user_id):
-    return_data = {
-        "data": []
-    }
-    with open(DATA_FILE) as f:
-        reader = csv.reader(f)
-        head_row=next(reader)
-        for row in reader:
-            if row[5] != user_id:
-                activity = {
-                    'title': row[1],
-                    'position': row[3],
-                    'status': row[7],
-                    'participant': row[6],
-                    'key_word': row[8]
-                }
-                return_data['data'].append(activity)
-    return return_data
-
-@app.route('/get_task_on_map', methods = ['GET', "POST"])
-def get_task_on_map():
-    data = request.get_json(silent=True)
-    user_id = data['user_id']
-    return_data = get_map_data(user_id)
-    return make_response(jsonify(return_data))
-
-def get_map_data(user_id):
-    return_data = {
-        'freeData': [],
-        'discountsData': []
-    }
-    with open(DATA_FILE) as f:
-        reader = csv.reader(f)
-        head_row=next(reader)
-        for row in reader:
-            activity = {
-                'name': row[1],
-                'value': [
-                    float(row[4].split(',')[0][1:]), # 经度
-                    float(row[4].split(',')[1][:-1]), # 纬度
-                    row[3], # position
-                    row[2], # distription
-                    row[9], # requirement
-                    row[8], # key word
-                    row[11], # pic
-                    row[12], # store distription
-                    row[10], # task
-                ]
-            }
-            if row[5] == user_id:
-                return_data['discountsData'].append(activity)
-            else:
-                return_data['freeData'].append(activity) 
-    return return_data
 
 ''' input: radio_id '''
 ''' {'111':{'name': '', 'birthdate': '', },
@@ -246,9 +159,9 @@ def get_map_data(user_id):
     }'''
 @app.route('/get_CT_list', methods=['GET','POST'])
 def get_CT_list():
-    return_data= {
-        'code' = 20000,
-        'data' = {}
+    return_data = {
+        'code': 20000,
+        'data': {}
     }
 
     data = request.get_json(silent=True)
