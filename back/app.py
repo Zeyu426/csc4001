@@ -38,7 +38,9 @@ def upload_image():
 
     return_data = {
         "code": 20000,
-        "data": "admin-token",
+        "data": {
+            'role': "admin-token",
+        }
     }
     return make_response(jsonify(return_data))
 
@@ -54,7 +56,7 @@ def upload_image():
 # api.add_resource(Hello, '/hello')
 
 
-@app.route('/vue-admin-template/user/login', methods=['GET','POST'])
+@app.route('/api/user/login', methods=['GET','POST'])
 def login_test():
     data = request.get_json(silent=True)
     return_data = {
@@ -63,9 +65,13 @@ def login_test():
             'token':"admin-token",
         }
     }
+    error_return = {
+        'code': 12345,
+        'message': 'ERROR data'
+    }
     return make_response(jsonify(return_data))
 
-@app.route('/vue-admin-template/user/info', methods=['GET','POST'])
+@app.route('/api/user/info', methods=['GET','POST'])
 def test2():
     data = request.get_json(silent=True)
     print(data)
@@ -80,7 +86,7 @@ def test2():
     }
     return make_response(jsonify(return_data))
 
-@app.route('/vue-admin-template/user/logout', methods=['GET','POST'])
+@app.route('/api/user/logout', methods=['GET','POST'])
 def test3():
     data = request.get_json(silent=True)
     return_data = {
