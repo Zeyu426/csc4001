@@ -112,6 +112,20 @@ export const constantRoutes = [
       meta: { title: 'Patient List 2', icon: 'form' }
     }]
   },
+  
+  {
+    path: '/role_management',
+    component: Layout,
+    redirect: '/role_management/role',
+    children: [
+      {
+        path: 'role',
+        name: 'RoleManagement',
+        component: () => import('@/views/role_management'),
+        meta: { title: 'Role Management', icon: 'form' }
+      }
+    ]
+  },
 
   {
     path: '/example',
@@ -216,7 +230,7 @@ export const constantRoutes = [
         meta: { title: 'External Link', icon: 'link' }
       }
     ]
-  },
+  }
 
   // // 404 page must be placed at the end !!!
   // { path: '*', redirect: '/404', hidden: true }
