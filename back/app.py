@@ -13,6 +13,17 @@ app = Flask(__name__)
 CORS(app)
 api = Api(app)
 
+def SQL_query(sql):
+    conn = pymysql.connect(host = '182.61.17.45', 
+                    user = "csc4001",
+                    passwd = "123456", 
+                    database = "Hospital")
+    cur = conn.cursor()
+    cur.execute(sql)
+    result = cur.fetchall()
+    cur.close()
+    conn.close()
+    return result
 
 @app.route('/', methods=["GET"])
 def index():
@@ -227,6 +238,38 @@ def get_map_data(user_id):
             else:
                 return_data['freeData'].append(activity) 
     return return_data
+
+''' input: radio_id '''
+''' {'111':{'name': '', 'birthdate': '', },
+    '222': {},
+    '333': {}
+    }'''
+@app.route('/get_CT_list', methods=['GET','POST'])
+def get_CT_list():
+    return_data= {
+        'code' = 20000,
+        'data' = {}
+    }
+
+    data = request.get_json(silent=True)
+    radio_id = data['radio_id']
+
+    #Fetch data
+    sql = f'''select p.patient_id, p.name, p.birthDate, p.gender, a.sickness, c.status
+            from CT c join Appointment a on c.app_id = a.app_id join Patient p on a.patient_id = p.patient_id
+            where radio_id = %d
+            order by c.status'''
+    result = SQL_query(sql,(radio_id,))
+    
+    for i in result:
+        return_data['data'][i[0]] = {}
+        return_data['data'][i[0]]["name"] = i[1]
+        return_data['data'][i[0]]["birthDate"] = i[2]
+        return_data['data'][i[0]]["gender"] = i[3]
+        return_data['data'][i[0]]["sickness"] = i[4]
+        return_data['data'][i[0]]["status"] = i[5]
+
+    return make_response(jsonify(return_data))
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=8010)
