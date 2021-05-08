@@ -7,11 +7,16 @@ from flask import (abort, current_app, jsonify,
 
 import csv
 import pymysql
+import json
+
 DATA_FILE = "./data.csv"
 
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
+
+with open("route.json", 'r') as f:
+    ROUTE = json.load(f)
 
 def SQL_query(sql):
     conn = pymysql.connect(host = '182.61.17.45', 
@@ -102,7 +107,7 @@ def login_test():
         return_data = {
             "code": 20000,
             "data": {
-                'token': df[0][2]
+                'token': df[0][3]
             }
         }
     # return_data = {
@@ -121,8 +126,7 @@ def login_test():
 @app.route('/api/user/info', methods=['GET','POST'])
 def test2():
     data = request.get_json(silent=True)
-    print(data)
-    token = data['token']
+    token = data['token'].split(',')
     return_data = {
         'code': 20000,
         'data': {
@@ -133,21 +137,9 @@ def test2():
             'menus': []
         }
     }
-    if True:
-        return_data['data']['menus'] = [
-            {
-                'path': '/form',
-                'component': 'Layout',
-                'children': [
-                {
-                    'path': 'index',
-                    'name': 'Form',
-                    'component': 'form/index',
-                    'meta': { 'title': 'Form', 'icon': 'form' }
-                }
-                ]
-            }
-        ]
+
+    for page in token:
+        return_data['data']['menus'].append(ROUTE[page])
     return make_response(jsonify(return_data))
 
 @app.route('/api/user/logout', methods=['GET','POST'])
