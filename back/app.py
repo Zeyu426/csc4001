@@ -245,8 +245,6 @@ def generate_CT_report(): """
 def upload_CT_report():
     patient_id = request.form.get("patient_id")
     report = request.form.get("report")
-    print(patient_id)
-    print(report)
     ''' 通过sql将报告存入CT '''
     SQL_update(f'''update CT c inner join Appointment a on c.app_id = a.app_id set report = "{report}" 
     where patient_id = {patient_id} and c.status = "waiting"''')
@@ -406,7 +404,7 @@ def get_patient_dashboard():
     ''' 有几个人在CT表中先于这个人，等待时间为5*前面的人数 '''
     ''' {'name': '', 'people': '', 'time': ''}'''
     #find the patient's CT_id
-    sql = f'''select name, CT_id from CT c join Appointment a on c.app_id = a.app_id where patient_id = {patient_id} and c.status = "waiting"'''
+    sql = f'''select name, CT_id from CT c join Appointment a on c.app_id = a.app_id join Patient where a.patient_id = {patient_id} and c.status = "waiting"'''
     result = SQL_query(sql)
     if len(result)==0:
         return_data = {
@@ -437,7 +435,7 @@ def get_doc_dashboard():
         appointment里总共几个人 '''
     ''' {'name': '', 'processing': '', 'waiting': '', 'finished': '', 'total': ''}'''
     # get name and total
-    sql = f'''select name, count(app_id) from Out_doctor o join Appointment a on o.outdoc_id = a.outdoc_id where outdoc_id = {doc_id}'''
+    sql = f'''select name, count(app_id) from Out_doctor o join Appointment a on o.outdoc_id = a.outdoc_id where o.outdoc_id = {doc_id}'''
     result = SQL_query(sql)
     name = result[0][0]
     total = result[0][1]

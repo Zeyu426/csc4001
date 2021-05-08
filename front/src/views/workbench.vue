@@ -43,8 +43,8 @@
 
     <div class="button">
       <el-row>
-        <el-button type="primary">Generate</el-button>
-        <el-button type="primary">Upload<i class="el-icon-upload el-icon--right"></i></el-button>
+        <el-button type="primary" @click="handleClick">Generate</el-button>
+        <el-button type="primary" @click="handleClick2">Upload<i class="el-icon-upload el-icon--right"></i></el-button>
       </el-row>
     </div>
 
@@ -54,8 +54,17 @@
         type="textarea"
         :autosize="{ minRows: 10, maxRows: 20}"
         placeholder="Please Enter:"
-        v-model="textarea2">
+        v-model="report">
       </el-input>
+    </div>
+
+    <div class="message">
+      <el-dialog class="message" title="" :visible.sync="dialogVisible">
+        <div class="button">
+          <h1> Succeed! </h1>
+          <el-button type="primary" @click="handleClick3">Confirm</el-button>
+        </div>
+      </el-dialog>
     </div>
 
     <!-- <div>
@@ -74,12 +83,13 @@ export default {
     return {
       //url: "https://jsonplaceholder.typicode.com/posts/",
       //url: "https://127.0.0.1:8010/upload_image",
+      dialogVisible: false,
       url: "182.61.17.45",
       previewImage: null,
       headers: {
         'Content-Type': 'multipart/form-data'
       },
-      textarea2: "",
+      report: "",
       patient_id: null,
       localUrl: null,
     }
@@ -89,6 +99,28 @@ export default {
     console.log(this.patient_id)
   },
   methods: {
+    handleClick() {
+
+    },
+    handleClick2() {
+      let data = new FormData
+      data.append("patient_id", this.patient_id)
+      data.append("report", this.report)
+      request({
+        url: "/upload_CT_report",
+        method: 'post',
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        data
+      })
+      .then(res => {
+        this.dialogVisible = true
+      })
+    },
+    handleClick3() {
+      this.$router.push({name: 'Patient_list'})
+    },
     uploadImage(e){
       console.log(e);
       const image = e.target.files[0];
@@ -157,6 +189,13 @@ export default {
 </script>
 
 <style scoped>
+.message {
+  margin: 0 auto;
+  width: 600px;
+}
+.button {
+  top: -20px;
+}
 .picture{
   width: 360px;
   height: 180px;
