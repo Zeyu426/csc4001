@@ -237,10 +237,6 @@ def generate_CT_report(): """
 def upload_CT_report():
     patient_id = request.form.get("patient_id")
     report = request.form.get("report")
-<<<<<<< HEAD
-
-=======
->>>>>>> d33f60ab4cebb6e99aaac25d7c8a34ae0c78395f
     ''' 通过sql将报告存入CT '''
     SQL_update(f'''update CT c inner join Appointment a on c.app_id = a.app_id set report = "{report}", c.status = "finished" 
     where patient_id = {patient_id} and c.status = "waiting"''')
@@ -466,6 +462,33 @@ def get_doc_dashboard():
 
     return make_response(jsonify(return_data))
 
+@app.route('/update_privilege', methods=['GET','POST'])
+def update_privilege():
+    return_data = {
+        'code': 20000,
+        'data': {}
+    }
+    id_ = request.form.get("id")
+    privilege = request.form.get("privilege")
+
+    sql = f'''update Account set privilege = {privilege} where id = {id_}'''
+    SQL_update(sql)
+    return make_response(jsonify(return_data))
+
+@app.route('/get_user_list', methods=['GET','POST'])
+def get_user_list():
+    return_data = {
+        'code': 20000,
+        'data': {}
+    }
+    #{'id': , 'role': "", 'privilege': ""}
+    sql = f'''select id, identity, privilege from Account'''
+    result = SQL_query(sql)
+    for i in result:
+        return_data['data']['id'] = i[0]
+        return_data['data']['role'] = i[1]
+        return_data['data']['privilege'] = i[2]
+    return make_response(jsonify(return_data))
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=8010)
