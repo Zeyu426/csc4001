@@ -25,6 +25,17 @@ def SQL_query(sql):
     conn.close()
     return result
 
+def SQL_update(sql):
+    conn = pymysql.connect(host = '182.61.17.45', 
+                    user = "csc4001",
+                    passwd = "123456", 
+                    database = "Hospital")
+    cur = conn.cursor()
+    cur.execute(sql)
+    conn.commit()
+    cur.close()
+    conn.close()
+
 @app.route('/', methods=["GET"])
 def index():
     return "Welcome to API v1, try /hello."
@@ -160,34 +171,20 @@ def hellp_api():
     }'''
 @app.route('/get_CT_list', methods=['GET','POST'])
 def get_CT_list():
-<<<<<<< HEAD
 
     return_data= {
         'code' : 20000,
         'data' : {}
-=======
-    return_data = {
-        'code': 20000,
-        'data': {}
->>>>>>> fb56c0512005624cbcc9550f826d0453f1280e04
     }
     
-    #data = request.get_json(silent=True)
-    radio_id = request.form.get("radio_id")
-    #print
-    #radio_id = int(radio_id)
-    #radio_id = data['radio_id']
+    data = request.get_json(silent=True)
+    radio_id = data['radio_id']
 
     #Fetch data
     sql = f'''select p.patient_id, p.name, p.birthDate, p.gender, a.sickness, c.status
             from CT c join Appointment a on c.app_id = a.app_id join Patient p on a.patient_id = p.patient_id
             where radio_id = {radio_id}
-<<<<<<< HEAD
             order by c.status'''
-=======
-            order by c.status;'''
-    
->>>>>>> fb56c0512005624cbcc9550f826d0453f1280e04
     result = SQL_query(sql)
     
     for i in result:
@@ -200,54 +197,171 @@ def get_CT_list():
 
     return make_response(jsonify(return_data))
 
-
 """ @app.route('/generate_CT_report', methods=['GET','POST'])
 def generate_CT_report(): """
 
-
-""" @app.route('/upload_CT_report', methods=['GET','POST'])
+@app.route('/upload_CT_report', methods=['GET','POST'])
 def upload_CT_report():
     patient_id = request.form.get("patient_id")
     report = request.form.get("report")
     ''' 通过sql将报告存入CT '''
+    SQL_update(f'''update CT c inner join Appointment a on c.app_id = a.app_id set report = "{report}" 
+    where patient_id = {patient_id} and c.status = "waiting"''')
+
 
 @app.route('/upload_sickness', methods=['GET','POST'])
 def upload_sickness():
     patient_id = request.form.get("patient_id")
     sickness = request.form.get("sickness")
     ''' 通过sql将sickness存入Appointment '''
+    SQL_update(f'''update Appointment set sickness = "{sickness}" where patient_id = {patient_id} and status = "processing"''')
 
 @app.route('/get_main_list', methods=['GET','POST'])
 def get_main_list():
+    return_data = {
+        'code': 20000,
+        'data': {}
+    }
     out_doc_id = request.form.get("out_doc_id")
     ''' 需要这个主治医师名下，appointment.status为processing的 appointment '''
     '''{'111':{'name': '', 'birthdate': '', 'gender': '', 'sickness': '', 'ct_status': ''},
     '222': {},
     '333': {}
     }'''
+    sql = f'''select p.patient_id, p.name, p.birthDate, p.gender, a.sickness, c.status
+            from CT c join Appointment a on c.app_id = a.app_id join Patient p on a.patient_id = p.patient_id
+            where outdoc_id = {out_doc_id} and a.status = "processing"
+            order by c.status  '''
+    result = SQL_query(sql)
+
+    for i in result:
+        return_data['data'][i[0]] = {}
+        return_data['data'][i[0]]["name"] = i[1]
+        return_data['data'][i[0]]["birthDate"] = i[2]
+        return_data['data'][i[0]]["gender"] = i[3]
+        return_data['data'][i[0]]["sickness"] = i[4]
+        return_data['data'][i[0]]["ct_status"] = i[5]
+    return make_response(jsonify(return_data))
 
 @app.route('/arrange_CT', methods=['GET','POST'])
 def arrange_CT():
     patient_id = request.form.get("patient_id")
-    'radio_id直接特殊定一个吧'
+    'radio_id直接特殊定一个吧: 定为1'
     ''' 为这个病人安排CT：在CT表中加上一行它 '''
+    # find CT_id for the new CT
+    result = SQL_query('select max(CT_id) from CT')
+    if type(result[0][0])!=int:
+        CT_id = 1
+    else:
+        CT_id = result[0][0]+1
 
+    # find the app_id
+    result = SQL_query(f'''select app_id 
+    from Appointment a join Patient p on a.patient_id = p.patient_id 
+    where a.patient_id = {patient_id}''')
+    if len(result)!=1:
+        print('Error in arrange_CT(): maybe caused by no appointment created for this patient')
+        return
+    else:
+        app_id = result[0][0]+1
+    
+    sql = f'''insert into CT values({CT_id},{app_id}, 1, "", "", "waiting")'''
+    SQL_update(sql)
+
+''' 在appoingment里把status改为finished '''
 @app.route('/finish_appointment', methods=['GET','POST'])
 def finish_appointment():
     patient_id = request.form.get("patient_id")
-    ''' 在appoingment里把status改为finished '''
+    sql = f'''update Appointment a inner join Patient p on a.patient_id = p.patient_id set status = "finished" 
+    where status = "waiting" and p.patient_id = {patient_id}'''
+    SQL_update(sql)
 
 @app.route('/get_CT_doctor_profile', methods=['GET','POST'])
 def get_CT_doctor_profile():
+    return_data = {
+        'code': 20000,
+        'data': {}
+    }
     doc_id = request.form.get("doc_id")
     ''' {'name': '', 'doc_id': '', 'gender': '', 'phone': '', 'department': '', 'office': '', 'title': '', 'specialty': ''} '''
+    result = SQL_query(f'''select * from Radiologist where radio_id = {doc_id}''')
+
+    if (len(result)==0):
+        return_data = {
+            'code': 00000,
+            'message': 'Cannot find the radiologist'
+        }
+    else:
+        return_data['data']['name'] = result[0][1]
+        return_data['data']['doc_id'] = result[0][0]
+        return_data['data']['gender'] = result[0][2]
+        return_data['data']['phone'] = result[0][3]
+        return_data['data']['department'] = result[0][4]
+        return_data['data']['office'] = result[0][5]
+        return_data['data']['title'] = result[0][6]
+        return_data['data']['specialty'] = result[0][7]
+
+    return make_response(jsonify(return_data))
+
 
 @app.route('/get_main_doctor_profile', methods=['GET','POST'])
 def get_main_doctor_profile():
+    return_data = {
+        'code': 20000,
+        'data': {}
+    }
     doc_id = request.form.get("doc_id")
-    ''' {'name': '', 'doc_id': '', 'gender': '', 'phone': '', 'department': '', 'office': '', 'title': '', 'specialty': ''} ''' """
+    ''' {'name': '', 'doc_id': '', 'gender': '', 'phone': '', 'department': '', 'office': '', 'title': '', 'specialty': ''} '''
+
+    result = SQL_query(f'''select * from Out_doc where outdoc_id = {doc_id}''')
+    if len(result)==0:
+        return_data = {
+            'code': 00000,
+            'message': 'Cannot find the outpatient doctor'
+        }
+    else:
+        return_data['data']['name'] = result[0][1]
+        return_data['data']['doc_id'] = result[0][0]
+        return_data['data']['gender'] = result[0][2]
+        return_data['data']['phone'] = result[0][3]
+        return_data['data']['department'] = result[0][4]
+        return_data['data']['office'] = result[0][5]
+        return_data['data']['title'] = result[0][6]
+        return_data['data']['specialty'] = result[0][7]
+
+    return make_response(jsonify(return_data))
+
+@app.route('/get_patient_dashboard', methods=['GET','POST'])
+def get_patient_dashboard():
+    return_data = {
+        'code': 20000,
+        'data': {}
+    }
+    patient_id = request.form.get("patient_id")
+    ''' 有几个人在CT表中先于这个人，等待时间为5*前面的人数 '''
+    ''' {'name': '', 'people': '', 'time': ''}'''
+    #find the patient's CT_id
+    sql = f'''select CT_id from CT c join Appointment a on c.app_id = a.app_id where patient_id = {patient_id} and c.status = "waiting"'''
+    result = SQL_query(sql)
+    if len(result)==0:
+        return_data = {
+            'code': 00000,
+            'message': "Cannot find the patient's CT order"
+        }
+    else:
+        CT_id = result[0][0]
+        sql = f'''select count(CT_id) from CT where CT_id < {CT_id} and status = "waiting"'''
+        result = SQL_query(sql)
 
 
+@app.route('/get_doc_dashboard', methods=['GET','POST'])
+def get_doc_dashboard():
+    doc_id = request.form.get("doc_id")
+    ''' 有几个人在appointment里是processing
+        有几个人在ct里是waiting
+        有几个人在appointment里是finished
+        appointment里总共几个人 '''
+    ''' {'name': '', 'processing': '', 'waiting': '', 'finished': '', 'total': ''}'''
 
 
 if __name__ == "__main__":
