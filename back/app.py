@@ -218,8 +218,8 @@ def get_CT_list():
         'data' : {}
     }
     
-    data = request.get_json(silent=True)
-    radio_id = data['radio_id']
+    #data = request.get_json(silent=True)
+    radio_id = request.form.get("radio_id")
 
     #Fetch data
     sql = f'''select p.patient_id, p.name, p.birthDate, p.gender, a.sickness, c.status
@@ -245,9 +245,16 @@ def generate_CT_report(): """
 def upload_CT_report():
     patient_id = request.form.get("patient_id")
     report = request.form.get("report")
+    print(patient_id)
+    print(report)
     ''' 通过sql将报告存入CT '''
     SQL_update(f'''update CT c inner join Appointment a on c.app_id = a.app_id set report = "{report}" 
     where patient_id = {patient_id} and c.status = "waiting"''')
+    return_data = {
+        'code': 20000,
+        'data': {'patient_id': patient_id}
+    }
+    return make_response(jsonify(return_data))
 
 
 @app.route('/upload_sickness', methods=['GET','POST'])
@@ -256,6 +263,11 @@ def upload_sickness():
     sickness = request.form.get("sickness")
     ''' 通过sql将sickness存入Appointment '''
     SQL_update(f'''update Appointment set sickness = "{sickness}" where patient_id = {patient_id} and status = "processing"''')
+    return_data = {
+        'code': 20000,
+        'data': {'patient_id': patient_id}
+    }
+    return make_response(jsonify(return_data))
 
 @app.route('/get_main_list', methods=['GET','POST'])
 def get_main_list():
@@ -308,14 +320,25 @@ def arrange_CT():
     
     sql = f'''insert into CT values({CT_id},{app_id}, 1, "", "", "waiting")'''
     SQL_update(sql)
+    return_data = {
+        'code': 20000,
+        'data': {'patient_id': patient_id}
+    }
+    return make_response(jsonify(return_data))
 
 ''' 在appoingment里把status改为finished '''
 @app.route('/finish_appointment', methods=['GET','POST'])
 def finish_appointment():
     patient_id = request.form.get("patient_id")
     sql = f'''update Appointment a inner join Patient p on a.patient_id = p.patient_id set status = "finished" 
-    where status = "waiting" and p.patient_id = {patient_id}'''
+    where status = "processing" and p.patient_id = {patient_id}'''
     SQL_update(sql)
+
+    return_data = {
+        'code': 20000,
+        'data': {'patient_id': patient_id}
+    }
+    return make_response(jsonify(return_data))
 
 @app.route('/get_CT_doctor_profile', methods=['GET','POST'])
 def get_CT_doctor_profile():
@@ -354,7 +377,7 @@ def get_main_doctor_profile():
     doc_id = request.form.get("doc_id")
     ''' {'name': '', 'doc_id': '', 'gender': '', 'phone': '', 'department': '', 'office': '', 'title': '', 'specialty': ''} '''
 
-    result = SQL_query(f'''select * from Out_doc where outdoc_id = {doc_id}''')
+    result = SQL_query(f'''select * from Out_doctor where outdoc_id = {doc_id}''')
     if len(result)==0:
         return_data = {
             'code': 00000,

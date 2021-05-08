@@ -72,6 +72,7 @@
 <script>
 import CountTo from 'vue-count-to'
 import PanelGroup from '../components/PanelGroup'
+import request from '@/utils/request'
 
 const lineChartData = {
   newVisitis: {
