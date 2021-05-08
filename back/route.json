@@ -1,0 +1,117 @@
+{
+    "dashboard": {
+        "path": "/",
+        "component": "Layout",
+        "redirect": "/dashboard",
+        "children": [
+            {
+                "path": "dashboard",
+                "name": "Dashboard",
+                "component": "dashboard",
+                "meta": {
+                    "title": "Dashboard",
+                    "icon": "dashboard"
+                }
+            }
+        ]
+    },
+    "dash": {
+        "path": "/",
+        "component": "Layout",
+        "redirect": "/dash",
+        "children": [
+            {
+                "path": "dash",
+                "name": "Dash",
+                "component": "dash",
+                "meta": {
+                    "title": "Dash",
+                    "icon": "dashboard"
+                }
+            }
+        ]
+    },
+    "CT": {
+        "path": "/patient_list",
+        "component": "Layout",
+        "redirect": "/dashboard",
+        "name": "CT",
+        "meta": {
+            "title": "CT",
+            "icon": "el-icon-s-help"
+        },
+        "children": [
+            {
+                "path": "patient_list",
+                "name": "Patient_list",
+                "component": "patient_list",
+                "meta": {
+                    "title": "Patient List",
+                    "icon": "form"
+                }
+            },
+            {
+                "path": "workbench",
+                "name": "Workbench",
+                "component": "workbench",
+                "meta": {
+                    "title": "Workbench",
+                    "icon": "form"
+                }
+            }
+        ]
+    },
+    "profile": {
+        "path": "/profile",
+        "component": "Layout",
+        "redirect": "/dashboard",
+        "children": [
+            {
+                "path": "pro",
+                "name": "Profile",
+                "component": "profile",
+                "meta": {
+                    "title": "Profile",
+                    "icon": "dashboard"
+                }
+            }
+        ]
+    },
+    "patient_list2": {
+        "path": "/patient_list2",
+        "component": "Layout",
+        "redirect": "/dashboard",
+        "name": "Main",
+        "meta": {
+            "title": "Main",
+            "icon": "el-icon-s-help"
+        },
+        "children": [
+            {
+                "path": "patient_list2",
+                "name": "Patient_list2",
+                "component": "patient_list2",
+                "meta": {
+                    "title": "Patient List 2",
+                    "icon": "form"
+                }
+            }
+        ]
+    },
+    "role_management": {
+        "path": "/role_management",
+        "component": "Layout",
+        "redirect": "/role_management/role",
+        "children": [
+            {
+                "path": "role",
+                "name": "RoleManagement",
+                "component": "role_management",
+                "meta": {
+                    "title": "Role Management",
+                    "icon": "form"
+                }
+            }
+        ]
+    }
+}

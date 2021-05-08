@@ -62,22 +62,22 @@ const actions = {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar } = data
+        const { name, avatar, menus } = data
 
-        const menus = [
-          {
-            'path': '/form',
-            'component': 'Layout',
-            'children': [
-              {
-                'path': 'index',
-                'name': 'Form',
-                'component': 'form/index',
-                'meta': { 'title': 'Form', 'icon': 'form' }
-              }
-            ]
-          }
-        ]
+        // const menus = [
+        //   {
+        //     'path': '/form',
+        //     'component': 'Layout',
+        //     'children': [
+        //       {
+        //         'path': 'index',
+        //         'name': 'Form',
+        //         'component': 'form/index',
+        //         'meta': { 'title': 'Form', 'icon': 'form' }
+        //       }
+        //     ]
+        //   }
+        // ]
 
         menus.push({
           path: '*',

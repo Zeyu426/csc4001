@@ -7,11 +7,16 @@ from flask import (abort, current_app, jsonify,
 
 import csv
 import pymysql
+import json
+
 DATA_FILE = "./data.csv"
 
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
+
+with open("route.json", 'r') as f:
+    ROUTE = json.load(f)
 
 def SQL_query(sql):
     conn = pymysql.connect(host = '182.61.17.45', 
@@ -102,7 +107,7 @@ def login_test():
         return_data = {
             "code": 20000,
             "data": {
-                'token': df[0][2]
+                'token': df[0][3]
             }
         }
     # return_data = {
@@ -121,8 +126,7 @@ def login_test():
 @app.route('/api/user/info', methods=['GET','POST'])
 def test2():
     data = request.get_json(silent=True)
-    print(data)
-    token = data['token']
+    token = data['token'].split(',')
     return_data = {
         'code': 20000,
         'data': {
@@ -133,21 +137,9 @@ def test2():
             'menus': []
         }
     }
-    if True:
-        return_data['data']['menus'] = [
-            {
-                'path': '/form',
-                'component': 'Layout',
-                'children': [
-                {
-                    'path': 'index',
-                    'name': 'Form',
-                    'component': 'form/index',
-                    'meta': { 'title': 'Form', 'icon': 'form' }
-                }
-                ]
-            }
-        ]
+
+    for page in token:
+        return_data['data']['menus'].append(ROUTE[page])
     return make_response(jsonify(return_data))
 
 @app.route('/api/user/logout', methods=['GET','POST'])
@@ -245,7 +237,10 @@ def generate_CT_report(): """
 def upload_CT_report():
     patient_id = request.form.get("patient_id")
     report = request.form.get("report")
+<<<<<<< HEAD
 
+=======
+>>>>>>> d33f60ab4cebb6e99aaac25d7c8a34ae0c78395f
     ''' 通过sql将报告存入CT '''
     SQL_update(f'''update CT c inner join Appointment a on c.app_id = a.app_id set report = "{report}", c.status = "finished" 
     where patient_id = {patient_id} and c.status = "waiting"''')
@@ -415,7 +410,7 @@ def get_patient_dashboard():
     ''' 有几个人在CT表中先于这个人，等待时间为5*前面的人数 '''
     ''' {'name': '', 'people': '', 'time': ''}'''
     #find the patient's CT_id
-    sql = f'''select name, CT_id from CT c join Appointment a on c.app_id = a.app_id where patient_id = {patient_id} and c.status = "waiting"'''
+    sql = f'''select name, CT_id from CT c join Appointment a on c.app_id = a.app_id join Patient where a.patient_id = {patient_id} and c.status = "waiting"'''
     result = SQL_query(sql)
     if len(result)==0:
         return_data = {
@@ -446,7 +441,7 @@ def get_doc_dashboard():
         appointment里总共几个人 '''
     ''' {'name': '', 'processing': '', 'waiting': '', 'finished': '', 'total': ''}'''
     # get name and total
-    sql = f'''select name, count(app_id) from Out_doctor o join Appointment a on o.outdoc_id = a.outdoc_id where outdoc_id = {doc_id}'''
+    sql = f'''select name, count(app_id) from Out_doctor o join Appointment a on o.outdoc_id = a.outdoc_id where o.outdoc_id = {doc_id}'''
     result = SQL_query(sql)
     name = result[0][0]
     total = result[0][1]

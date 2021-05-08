@@ -90,7 +90,7 @@
       <el-table-column class-name="status-col" label="CT Report" width="110" align="center">
         <template slot-scope="scope">
           <!-- <el-button type="text" v-if="scope.row.hasReport" @click="open(scope.row.id)">Report</el-button> -->
-          <el-button type="text" @click="handleClick2(scope.row)">Report</el-button>
+          <el-button type="text" @click="handleClick2(scope.row)" v-if="scope.row.report">Report</el-button>
 
         </template>
       </el-table-column>
@@ -172,11 +172,12 @@ export default {
       let data_list = res.data
       //let dic = {}
       for (var key in res.data) {
-        let dic = {'id': key, 'name': data_list[key]['name'], 'birthdate': data_list[key]['birthDate'], 'gender': data_list[key]['gender'], 'status': data_list[key]['ct_status'], 'sickness': data_list[key]['sickness'], 'originalSickness': null, 'edit': false}
+        let dic = {'id': key, 'name': data_list[key]['name'], 'birthdate': data_list[key]['birthDate'], 'gender': data_list[key]['gender'], 'status': data_list[key]['ct_status'], 'sickness': data_list[key]['sickness'], 'originalSickness': null, 'edit': false, 'report':data_list[key]['report']}
         if (dic['status'] == 'waiting')
           dic['hasReport'] = false
         if (dic['status'] == 'finished')
           dic['hasReport'] = true
+
         this.table_data.push(dic)
       }
       /* console.log(this.table_data)
@@ -239,7 +240,7 @@ export default {
     },
     handleClick2(row) {
       this.dialogTableVisible = true
-      this.textarea2 = "11111111111"
+      this.textarea2 = row.report
     },
     handleClick3(id) {
       let data = new FormData
