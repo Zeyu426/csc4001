@@ -245,10 +245,9 @@ def generate_CT_report(): """
 def upload_CT_report():
     patient_id = request.form.get("patient_id")
     report = request.form.get("report")
-    print(patient_id)
-    print(report)
+
     ''' 通过sql将报告存入CT '''
-    SQL_update(f'''update CT c inner join Appointment a on c.app_id = a.app_id set report = "{report}" 
+    SQL_update(f'''update CT c inner join Appointment a on c.app_id = a.app_id set report = "{report}", c.status = "finished" 
     where patient_id = {patient_id} and c.status = "waiting"''')
     return_data = {
         'code': 20000,
@@ -297,34 +296,44 @@ def get_main_list():
         return_data['data'][i[0]]["report"] = i[6]
     return make_response(jsonify(return_data))
 
+#'radio_id直接特殊定一个吧: 定为1'
 @app.route('/arrange_CT', methods=['GET','POST'])
 def arrange_CT():
-    patient_id = request.form.get("patient_id")
-    'radio_id直接特殊定一个吧: 定为1'
-    ''' 为这个病人安排CT：在CT表中加上一行它 '''
-    # find CT_id for the new CT
-    result = SQL_query('select max(CT_id) from CT')
-    if type(result[0][0])!=int:
-        CT_id = 1
-    else:
-        CT_id = result[0][0]+1
-
-    # find the app_id
-    result = SQL_query(f'''select app_id 
-    from Appointment a join Patient p on a.patient_id = p.patient_id 
-    where a.patient_id = {patient_id}''')
-    if len(result)!=1:
-        print('Error in arrange_CT(): maybe caused by no appointment created for this patient')
-        return
-    else:
-        app_id = result[0][0]+1
-    
-    sql = f'''insert into CT values({CT_id},{app_id}, 1, "", "", "waiting")'''
-    SQL_update(sql)
     return_data = {
         'code': 20000,
-        'data': {'patient_id': patient_id}
+        'data': {}
     }
+    patient_id = request.form.get("patient_id")
+    
+    result = SQL_query(f'''select count(*) from CT c join Appointment a on c.app_id = a.app_id 
+    where patient_id = {patient_id} and c.status = "waiting"''')
+    if result[0][0]!=0:
+        return_data = {
+            'code': 00000,
+            'message': "Error: cannot create a new CT order when the previous one has not finished"
+        }
+    else:
+        # find CT_id for the new CT
+        # if there is no CT created before, make this the first one.
+        result = SQL_query('select max(CT_id) from CT')
+        if type(result[0][0])!=int:
+            CT_id = 1
+        else:
+            CT_id = result[0][0]+1
+        # find the app_id
+        result = SQL_query(f'''select app_id 
+        from Appointment a join Patient p on a.patient_id = p.patient_id 
+        where a.patient_id = {patient_id} and status = "processing"''')
+        if len(result)==0:
+            return_data = {
+                'code': 00000,
+                'message': "Error: no processing appointment for this patient"
+            }
+        else:
+            app_id = result[0][0]
+            sql = f'''insert into CT values({CT_id},{app_id}, 1, "", "", "waiting")'''
+            SQL_update(sql)
+
     return make_response(jsonify(return_data))
 
 ''' 在appoingment里把status改为finished '''
