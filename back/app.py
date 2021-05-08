@@ -265,11 +265,11 @@ def get_main_list():
     }
     out_doc_id = request.form.get("out_doc_id")
     ''' 需要这个主治医师名下，appointment.status为processing的 appointment '''
-    '''{'111':{'name': '', 'birthdate': '', 'gender': '', 'sickness': '', 'ct_status': ''},
+    '''{'111':{'name': '', 'birthdate': '', 'gender': '', 'sickness': '', 'ct_status': '', 'report': ''},
     '222': {},
     '333': {}
     }'''
-    sql = f'''select p.patient_id, p.name, p.birthDate, p.gender, a.sickness, c.status
+    sql = f'''select p.patient_id, p.name, p.birthDate, p.gender, a.sickness, c.status, report
             from CT c join Appointment a on c.app_id = a.app_id join Patient p on a.patient_id = p.patient_id
             where outdoc_id = {out_doc_id} and a.status = "processing"
             order by c.status  '''
@@ -282,6 +282,7 @@ def get_main_list():
         return_data['data'][i[0]]["gender"] = i[3]
         return_data['data'][i[0]]["sickness"] = i[4]
         return_data['data'][i[0]]["ct_status"] = i[5]
+        return_data['data'][i[0]]["report"] = i[6]
     return make_response(jsonify(return_data))
 
 @app.route('/arrange_CT', methods=['GET','POST'])
@@ -412,21 +413,30 @@ def get_doc_dashboard():
         有几个人在appointment里是finished
         appointment里总共几个人 '''
     ''' {'name': '', 'processing': '', 'waiting': '', 'finished': '', 'total': ''}'''
-    sql = f'''select name, count(a.status) from Out_doctor o join Appointment a on o.outdoc_id = a.outdoc_id join CT c on c.app_id = a.app_id where patient_id = {patient_id} and c.status = "waiting"'''
+    # get name and total
+    sql = f'''select name, count(app_id) from Out_doctor o join Appointment a on o.outdoc_id = a.outdoc_id where outdoc_id = {doc_id}'''
     result = SQL_query(sql)
-    if len(result)==0:
-        return_data = {
-            'code': 00000,
-            'message': "Cannot find the patient's CT order"
-        }
-    else:
-        name = result[0][0]
-        CT_id = result[0][1]
-        sql = f'''select count(CT_id) from CT where CT_id < {CT_id} and status = "waiting"'''
-        result = SQL_query(sql)
-        return_data['data']['name'] = name
-        return_data['data']['people'] = result[0][0]
-        return_data['data']['time'] = result[0][0]*5
+    name = result[0][0]
+    total = result[0][1]
+    # get processing
+    sql = f'''select count(*) from Appointment where outdoc_id = {doc_id} and status = "processing"'''
+    result = SQL_query(sql)
+    processing = result[0][0]
+    # get finished
+    sql = f'''select count(*) from Appointment where outdoc_id = {doc_id} and status = "finished"'''
+    result = SQL_query(sql)
+    finished = result[0][0]
+    # get waiting
+    sql = f'''select count(*) from Appointment a join CT c on a.app_id = c.app_id where c.status = "waiting" '''
+    result = SQL_query(sql)
+    waiting = result[0][0]
+
+    return_data['data']['name'] = name
+    return_data['data']['processing'] = processing
+    return_data['data']['waiting'] = waiting
+    return_data['data']['finished'] = finished
+    return_data['data']['total'] = total
+
     return make_response(jsonify(return_data))
 
 
