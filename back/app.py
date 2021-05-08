@@ -159,16 +159,10 @@ def hellp_api():
     }'''
 @app.route('/get_CT_list', methods=['GET','POST'])
 def get_CT_list():
-<<<<<<< HEAD
 
     return_data= {
         'code' : 20000,
         'data' : {}
-=======
-    return_data = {
-        'code': 20000,
-        'data': {}
->>>>>>> 92a0aac0b711e63d5f080bd5378e91ae02c5d619
     }
     
     data = request.get_json(silent=True)
@@ -177,9 +171,9 @@ def get_CT_list():
     #Fetch data
     sql = f'''select p.patient_id, p.name, p.birthDate, p.gender, a.sickness, c.status
             from CT c join Appointment a on c.app_id = a.app_id join Patient p on a.patient_id = p.patient_id
-            where radio_id = %d
+            where radio_id = {radio_id}
             order by c.status'''
-    result = SQL_query(sql,(radio_id,))
+    result = SQL_query(sql)
     
     for i in result:
         return_data['data'][i[0]] = {}
