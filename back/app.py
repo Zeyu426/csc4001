@@ -45,7 +45,8 @@ def upload_image():
     print(name)
     print(description)
     print(fileObj)
-    print(fileObj.read())
+    fileObj.save('1.jpeg')
+    #print(fileObj.read())
 
     return_data = {
         "code": 20000,
@@ -205,15 +206,19 @@ def get_CT_list():
         'data': {}
     }
     
-    data = request.get_json(silent=True)
-    radio_id = data['radio_id']
+    #data = request.get_json(silent=True)
+    radio_id = request.form.get("radio_id")
+    #print
+    #radio_id = int(radio_id)
+    #radio_id = data['radio_id']
 
     #Fetch data
     sql = f'''select p.patient_id, p.name, p.birthDate, p.gender, a.sickness, c.status
             from CT c join Appointment a on c.app_id = a.app_id join Patient p on a.patient_id = p.patient_id
-            where radio_id = %d 
+            where radio_id = {radio_id}
             order by c.status'''
-    result = SQL_query(sql,(radio_id,))
+    
+    result = SQL_query(sql)
     
     for i in result:
         return_data['data'][i[0]] = {}
@@ -224,6 +229,56 @@ def get_CT_list():
         return_data['data'][i[0]]["status"] = i[5]
 
     return make_response(jsonify(return_data))
+
+
+""" @app.route('/generate_CT_report', methods=['GET','POST'])
+def generate_CT_report(): """
+
+
+""" @app.route('/upload_CT_report', methods=['GET','POST'])
+def upload_CT_report():
+    patient_id = request.form.get("patient_id")
+    report = request.form.get("report")
+    ''' 通过sql将报告存入CT '''
+
+@app.route('/upload_sickness', methods=['GET','POST'])
+def upload_sickness():
+    patient_id = request.form.get("patient_id")
+    sickness = request.form.get("sickness")
+    ''' 通过sql将sickness存入Appointment '''
+
+@app.route('/get_main_list', methods=['GET','POST'])
+def get_main_list():
+    out_doc_id = request.form.get("out_doc_id")
+    ''' 需要这个主治医师名下，appointment.status为processing的 appointment '''
+    '''{'111':{'name': '', 'birthdate': '', 'gender': '', 'sickness': '', 'ct_status': ''},
+    '222': {},
+    '333': {}
+    }'''
+
+@app.route('/arrange_CT', methods=['GET','POST'])
+def arrange_CT():
+    patient_id = request.form.get("patient_id")
+    'radio_id直接特殊定一个吧'
+    ''' 为这个病人安排CT：在CT表中加上一行它 '''
+
+@app.route('/finish_appointment', methods=['GET','POST'])
+def finish_appointment():
+    patient_id = request.form.get("patient_id")
+    ''' 在appoingment里把status改为finished '''
+
+@app.route('/get_CT_doctor_profile', methods=['GET','POST'])
+def get_CT_doctor_profile():
+    doc_id = request.form.get("doc_id")
+    ''' {'name': '', 'doc_id': '', 'gender': '', 'phone': '', 'department': '', 'office': '', 'title': '', 'specialty': ''} '''
+
+@app.route('/get_main_doctor_profile', methods=['GET','POST'])
+def get_main_doctor_profile():
+    doc_id = request.form.get("doc_id")
+    ''' {'name': '', 'doc_id': '', 'gender': '', 'phone': '', 'department': '', 'office': '', 'title': '', 'specialty': ''} ''' """
+
+
+
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=8010)

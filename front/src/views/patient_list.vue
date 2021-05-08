@@ -60,6 +60,7 @@
 
 <script>
 import { getList } from '@/api/table'
+import request from '@/utils/request'
 
 export default {
   filters: {
@@ -77,13 +78,40 @@ export default {
       list: null,
       listLoading: true,
       doc_id: null,
-      table_data: [{'id': 1234, 'name': 'fugui', 'birthdate': '2020-01-01', 'gender': 'female', 'status': 'waiting'},
-                    {'id': 2222, 'name': 'fugui', 'birthdate': '2020-01-01', 'gender': 'female', 'status': 'finished'}],
+      table_data: []
+      /* table_data: [{'id': 1234, 'name': 'fugui', 'birthdate': '2020-01-01', 'gender': 'female', 'status': 'waiting'},
+                    {'id': 2222, 'name': 'fugui', 'birthdate': '2020-01-01', 'gender': 'female', 'status': 'finished'}], */
     }
   },
   created() {
     this.doc_id = this.$store.getters.id
     console.log(this.doc_id)
+    let data = new FormData
+    //data.append("radio_id", this.doc_id)
+    data.append("radio_id", 1)
+
+    request({
+      url: "/get_CT_list",
+      method: 'post',
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      data
+    })
+    .then(res => {
+      let data_list = res.data
+      //let dic = {}
+      for (var key in res.data) {
+        let dic = {'id': key, 'name': data_list[key]['name'], 'birthdate': data_list[key]['birthDate'], 'gender': data_list[key]['gender'], 'status': data_list[key]['status'], 'sickness': data_list[key]['sickness']}
+        this.table_data.push(dic)
+      }
+      /* console.log(this.table_data)
+      console.log(res.data)
+      for (var key in res.data) {
+        console.log("key: " + key + " ,value: " + res.data[key]);
+      } */
+    })
+    
     this.fetchData()
   },
   methods: {
