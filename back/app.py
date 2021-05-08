@@ -82,31 +82,72 @@ def upload_image():
 @app.route('/api/user/login', methods=['GET','POST'])
 def login_test():
     data = request.get_json(silent=True)
-    return_data = {
-        "code": 20000,
-        "data": {
-            'token':"admin-token",
+    username = data['username']
+    password = data['password']
+
+    sql = f"SELECT * from Account WHERE id = '{username}'"
+    df = SQL_query(sql)
+
+    if len(df) == 0:
+        return_data = {
+            'code': 60001, # unknown user
+            'message': 'Unknown User'
         }
-    }
-    error_return = {
-        'code': 12345,
-        'message': 'ERROR data'
-    }
+    elif df[0][0] != password:
+        return_data = {
+            'code': 60002, # unknown user
+            'message': 'Invalid Password'
+        }
+    else:
+        return_data = {
+            "code": 20000,
+            "data": {
+                'token': df[0][2]
+            }
+        }
+    # return_data = {
+    #     "code": 20000,
+    #     "data": {
+    #         'token':"admin-token",
+    #     }
+    # }
+    # error_return = {
+    #     'code': 12345,
+    #     'message': 'ERROR data'
+    # }
     return make_response(jsonify(return_data))
+
 
 @app.route('/api/user/info', methods=['GET','POST'])
 def test2():
     data = request.get_json(silent=True)
     print(data)
+    token = data['token']
     return_data = {
         'code': 20000,
         'data': {
-            'roles': ['admin'],
-            'introduction': 'I am a super administrator',
+            'roles': [token],
+            'introduction': f'I am a {token}',
             'avatar': 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-            'name': 'Super Admin'
+            'name': 'Super Admin',
+            'menus': []
         }
     }
+    if True:
+        return_data['data']['menus'] = [
+            {
+                'path': '/form',
+                'component': 'Layout',
+                'children': [
+                {
+                    'path': 'index',
+                    'name': 'Form',
+                    'component': 'form/index',
+                    'meta': { 'title': 'Form', 'icon': 'form' }
+                }
+                ]
+            }
+        ]
     return make_response(jsonify(return_data))
 
 @app.route('/api/user/logout', methods=['GET','POST'])
