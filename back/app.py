@@ -70,31 +70,72 @@ def upload_image():
 @app.route('/api/user/login', methods=['GET','POST'])
 def login_test():
     data = request.get_json(silent=True)
-    return_data = {
-        "code": 20000,
-        "data": {
-            'token':"admin-token",
+    username = data['username']
+    password = data['password']
+
+    sql = f"SELECT * from Account WHERE id = '{username}'"
+    df = SQL_query(sql)
+
+    if len(df) == 0:
+        return_data = {
+            'code': 60001, # unknown user
+            'message': 'Unknown User'
         }
-    }
-    error_return = {
-        'code': 12345,
-        'message': 'ERROR data'
-    }
+    elif df[0][0] != password:
+        return_data = {
+            'code': 60002, # unknown user
+            'message': 'Invalid Password'
+        }
+    else:
+        return_data = {
+            "code": 20000,
+            "data": {
+                'token': df[0][2]
+            }
+        }
+    # return_data = {
+    #     "code": 20000,
+    #     "data": {
+    #         'token':"admin-token",
+    #     }
+    # }
+    # error_return = {
+    #     'code': 12345,
+    #     'message': 'ERROR data'
+    # }
     return make_response(jsonify(return_data))
+
 
 @app.route('/api/user/info', methods=['GET','POST'])
 def test2():
     data = request.get_json(silent=True)
     print(data)
+    token = data['token']
     return_data = {
         'code': 20000,
         'data': {
-            'roles': ['admin'],
-            'introduction': 'I am a super administrator',
+            'roles': [token],
+            'introduction': f'I am a {token}',
             'avatar': 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-            'name': 'Super Admin'
+            'name': 'Super Admin',
+            'menus': []
         }
     }
+    if True:
+        return_data['data']['menus'] = [
+            {
+                'path': '/form',
+                'component': 'Layout',
+                'children': [
+                {
+                    'path': 'index',
+                    'name': 'Form',
+                    'component': 'form/index',
+                    'meta': { 'title': 'Form', 'icon': 'form' }
+                }
+                ]
+            }
+        ]
     return make_response(jsonify(return_data))
 
 @app.route('/api/user/logout', methods=['GET','POST'])
@@ -159,16 +200,9 @@ def hellp_api():
     }'''
 @app.route('/get_CT_list', methods=['GET','POST'])
 def get_CT_list():
-<<<<<<< HEAD
-
-    return_data= {
-        'code' : 20000,
-        'data' : {}
-=======
     return_data = {
         'code': 20000,
         'data': {}
->>>>>>> 92a0aac0b711e63d5f080bd5378e91ae02c5d619
     }
     
     data = request.get_json(silent=True)
@@ -177,7 +211,7 @@ def get_CT_list():
     #Fetch data
     sql = f'''select p.patient_id, p.name, p.birthDate, p.gender, a.sickness, c.status
             from CT c join Appointment a on c.app_id = a.app_id join Patient p on a.patient_id = p.patient_id
-            where radio_id = %d
+            where radio_id = %d 
             order by c.status'''
     result = SQL_query(sql,(radio_id,))
     
