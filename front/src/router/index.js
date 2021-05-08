@@ -56,6 +56,18 @@ export const constantRoutes = [
   },
 
   {
+    path: '/dash',
+    component: Layout,
+    redirect: '/dashboard',
+    children: [{
+      path: 'dash',
+      name: 'Dash',
+      component: () => import('@/views/dash'),
+      meta: { title: 'Dash', icon: 'dashboard' }
+    }]
+  },
+
+  {
     path: '/patient_list',
     component: Layout,
     redirect: '/dashboard',
@@ -112,7 +124,7 @@ export const constantRoutes = [
       meta: { title: 'Patient List 2', icon: 'form' }
     }]
   },
-  
+
   {
     path: '/role_management',
     component: Layout,

@@ -47,7 +47,7 @@
       <el-row>
         <el-col :span="12">
           <form>
-            <h1 class="name font1"> Address </h1>
+            <h1 class="name font1"> Department </h1>
             <div class="name">
               <span> 11111 </span>
             </div>
@@ -66,7 +66,7 @@
       <el-row>
         <el-col :span="12">
           <form>
-            <h1 class="name font1"> Name </h1>
+            <h1 class="name font1"> Title </h1>
             <div class="name">
               <span> 11111 </span>
             </div>
@@ -74,7 +74,7 @@
         </el-col>
         <el-col :span="12">
           <form>
-            <h1 class="name font1"> Name </h1>
+            <h1 class="name font1"> Specialty </h1>
             <div class="name">
               <span> 11111 </span>
             </div>
