@@ -471,7 +471,7 @@ def update_privilege():
     id_ = request.form.get("id")
     privilege = request.form.get("privilege")
 
-    sql = f'''update Account set privilege = {privilege} where id = {id_}'''
+    sql = f'''update Account set privilege = "{privilege}"" where id = {id_}'''
     SQL_update(sql)
     return make_response(jsonify(return_data))
 
@@ -485,9 +485,9 @@ def get_user_list():
     sql = f'''select id, identity, privilege from Account'''
     result = SQL_query(sql)
     for i in result:
-        return_data['data']['id'] = i[0]
-        return_data['data']['role'] = i[1]
-        return_data['data']['privilege'] = i[2]
+        return_data['data'][i[0]] = {}
+        return_data['data'][i[0]]['role'] = i[1]
+        return_data['data'][i[0]]['privilege'] = i[2]
     return make_response(jsonify(return_data))
 
 if __name__ == "__main__":
