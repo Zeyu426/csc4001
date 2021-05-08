@@ -3,7 +3,7 @@
     <div class="page">
 
       <div>
-        <h1 class="one"> Hello, {{doctor_name}}!</h1>
+        <h1 class="one"> Hello, {{name}}!</h1>
       </div>
       
       <!-- <el-row>
@@ -34,7 +34,7 @@
             <div class="card-panel-text">
               Waiting for
             </div>
-            <count-to :start-val="0" :end-val="end_people_value" :duration="1000" class="card-panel-num" />
+            <count-to :start-val="0" :end-val="people" :duration="1000" class="card-panel-num" />
           </div>
         </div>
       </div>
@@ -49,7 +49,7 @@
             <div class="card-panel-text">
               Waiting for
             </div>
-            <count-to :start-val="0" :end-val="end_people_value" :duration="1000" class="card-panel-num" />
+            <count-to :start-val="0" :end-val="time" :duration="1000" class="card-panel-num" />
           </div>
         </div>
       </div>
@@ -72,25 +72,7 @@
 <script>
 import CountTo from 'vue-count-to'
 import PanelGroup from '../components/PanelGroup'
-
-const lineChartData = {
-  newVisitis: {
-    expectedData: [100, 120, 161, 134, 105, 160, 165],
-    actualData: [120, 82, 91, 154, 162, 140, 145]
-  },
-  messages: {
-    expectedData: [200, 192, 120, 144, 160, 130, 140],
-    actualData: [180, 160, 151, 106, 145, 150, 130]
-  },
-  purchases: {
-    expectedData: [80, 100, 121, 104, 105, 90, 100],
-    actualData: [120, 90, 100, 138, 142, 130, 130]
-  },
-  shoppings: {
-    expectedData: [130, 140, 141, 142, 145, 150, 160],
-    actualData: [120, 82, 91, 154, 162, 140, 130]
-  }
-}
+import request from '@/utils/request'
 
 export default {
   name: 'Dashboard',
@@ -100,17 +82,32 @@ export default {
   },
   data() {
     return {
-      doctor_name: "Jerry",
+      name: "Jerry",
+      people: null,
+      time: null,
       date: new Date().toUTCString(),
       end_people_value: 10,
       end_time_value: 50,
     }
   },
   created() {
-    let _this = this; // 声明一个变量指向Vue实例this，保证作用域一致
-    this.timer = setInterval(() => {
-      _this.date = new Date().toUTCString(); // 修改数据date
-    }, 1000)
+    let data = new FormData
+    data.append("patient_id", 3)
+    request({
+      url: "/get_patient_dashboard",
+      method: 'post',
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      data
+    })
+    .then(res => {
+      let data_list = res.data
+      this.name = data_list['name']
+      this.people = data_list['people']
+      this.time = data_list['time']
+      //console.log(res.data)
+    })
   },
   beforeDestroy() {
     if (this.timer) {

@@ -11,7 +11,7 @@
           <form>
             <h1 class="name font1"> Name </h1>
             <div class="name">
-              <span> 11111 </span>
+              <span> {{name}} </span>
             </div>
           </form>
         </el-col>
@@ -19,7 +19,7 @@
           <form>
             <h1 class="name font1"> Doctor ID </h1>
             <div class="name">
-              <span> 11111 </span>
+              <span> {{doc_id}} </span>
             </div>
           </form>
         </el-col>
@@ -30,7 +30,7 @@
           <form>
             <h1 class="name font1"> Gender </h1>
             <div class="name">
-              <span> 11111 </span>
+              <span> {{gender}} </span>
             </div>
           </form>
         </el-col>
@@ -38,7 +38,7 @@
           <form>
             <h1 class="name font1"> Telephone </h1>
             <div class="name">
-              <span> 11111 </span>
+              <span> {{telephone}} </span>
             </div>
           </form>
         </el-col>
@@ -49,7 +49,7 @@
           <form>
             <h1 class="name font1"> Department </h1>
             <div class="name">
-              <span> 11111 </span>
+              <span> {{department}} </span>
             </div>
           </form>
         </el-col>
@@ -57,7 +57,7 @@
           <form>
             <h1 class="name font1"> Office </h1>
             <div class="name">
-              <span> 11111 </span>
+              <span> {{office}} </span>
             </div>
           </form>
         </el-col>
@@ -68,7 +68,7 @@
           <form>
             <h1 class="name font1"> Title </h1>
             <div class="name">
-              <span> 11111 </span>
+              <span> {{title}} </span>
             </div>
           </form>
         </el-col>
@@ -76,89 +76,18 @@
           <form>
             <h1 class="name font1"> Specialty </h1>
             <div class="name">
-              <span> 11111 </span>
+              <span> {{specialty}} </span>
             </div>
           </form>
         </el-col>
       </el-row>
-
-      <!-- <el-row>
-        <el-col :span="12">
-          <h1 class="name font1"> Name </h1>
-        </el-col>
-        <el-col :span="12">
-          <div class="name2">
-            <span> 11111 </span>
-          </div>
-        </el-col>
-      </el-row>
-
-      <el-row>
-        <el-col :span="12">
-          <h1 class="name font1"> Doctor ID </h1>
-        </el-col>
-        <el-col :span="12">
-          <div class="name2">
-            <span> 11111 </span>
-          </div>
-        </el-col>
-      </el-row>
-
-      <el-row>
-        <el-col :span="12">
-          <h1 class="name font1"> Gender </h1>
-        </el-col>
-        <el-col :span="12">
-          <div class="name2">
-            <span> 11111 </span>
-          </div>
-        </el-col>
-      </el-row>
-
-      <el-row>
-        <el-col :span="12">
-          <h1 class="name font1"> Telephone </h1>
-        </el-col>
-        <el-col :span="12">
-          <div class="name2">
-            <span> 11111 </span>
-          </div>
-        </el-col>
-      </el-row>
-
-      <el-row>
-        <el-col :span="12">
-          <h1 class="name font1"> Address </h1>
-        </el-col>
-        <el-col :span="12">
-          <div class="name2">
-            <span> 11111 </span>
-          </div>
-        </el-col>
-      </el-row>
-
-      <el-row>
-        <el-col :span="12">
-          <h1 class="name font1"> Office </h1>
-        </el-col>
-        <el-col :span="12">
-          <div class="name2">
-            <span> 11111 </span>
-          </div>
-        </el-col>
-      </el-row> -->
-
-
-
-      <!-- <div v-for="o in 4" :key="o" class="text item">
-        {{'列表内容 ' + o }}
-      </div> -->
 
     </el-card>
   </div>
 </template>
 
 <script>
+import request from '@/utils/request'
 
 export default {
   props: {
@@ -166,10 +95,7 @@ export default {
       type: Object,
       default: () => {
         return {
-          name: '',
-          email: '',
-          avatar: '',
-          role: ''
+          
         }
       }
     }
@@ -178,12 +104,41 @@ export default {
     return {
       list: null,
       listLoading: true,
+      name: null,
+      doc_id: null,
+      gender: null,
+      telephone: null,
+      department: null,
+      office: null,
+      title: null,
+      specialty: null,
       table_data: [{'id': 1234, 'name': 'fugui', 'birthdate': '2020-01-01', 'gender': 'female', 'status': 'waiting'},
                     {'id': 2222, 'name': 'fugui', 'birthdate': '2020-01-01', 'gender': 'female', 'status': 'finished'}]
     }
   },
   created() {
-   
+    let data = new FormData
+    data.append('doc_id',1)
+   request({
+      url: "/get_CT_doctor_profile",
+      method: 'post',
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      data
+    })
+    .then(res => {
+      let data_list = res.data
+      this.name = data_list['name']
+      this.doc_id = data_list['doc_id']
+      this.gender = data_list['gender']
+      this.department = data_list['department']
+      this.telephone = data_list['phone']
+      this.office = data_list['office']
+      this.title = data_list['title']
+      this.specialty = data_list['specialty']
+      console.log(res.data)
+    })
   },
   methods: {
     

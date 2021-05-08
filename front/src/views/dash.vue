@@ -36,7 +36,7 @@
               <div class="card-panel-text">
                 Processing
               </div>
-              <count-to :start-val="0" :end-val="102400" :duration="2600" class="card-panel-num" />
+              <count-to :start-val="0" :end-val="processing" :duration="2600" class="card-panel-num" />
             </div>
           </div>
         </el-col>
@@ -49,7 +49,7 @@
               <div class="card-panel-text">
                 Waiting CT
               </div>
-              <count-to :start-val="0" :end-val="81212" :duration="3000" class="card-panel-num" />
+              <count-to :start-val="0" :end-val="waiting" :duration="3000" class="card-panel-num" />
             </div>
           </div>
         </el-col>
@@ -62,7 +62,7 @@
               <div class="card-panel-text">
                 Finished
               </div>
-              <count-to :start-val="0" :end-val="9280" :duration="3200" class="card-panel-num" />
+              <count-to :start-val="0" :end-val="finished" :duration="3200" class="card-panel-num" />
             </div>
           </div>
         </el-col>
@@ -75,7 +75,7 @@
               <div class="card-panel-text">
                 Total
               </div>
-              <count-to :start-val="0" :end-val="13600" :duration="3600" class="card-panel-num" />
+              <count-to :start-val="0" :end-val="total" :duration="3600" class="card-panel-num" />
             </div>
           </div>
         </el-col>
@@ -128,25 +128,9 @@
 <script>
 import CountTo from 'vue-count-to'
 import PanelGroup from '../components/PanelGroup'
+import request from '@/utils/request'
 
-const lineChartData = {
-  newVisitis: {
-    expectedData: [100, 120, 161, 134, 105, 160, 165],
-    actualData: [120, 82, 91, 154, 162, 140, 145]
-  },
-  messages: {
-    expectedData: [200, 192, 120, 144, 160, 130, 140],
-    actualData: [180, 160, 151, 106, 145, 150, 130]
-  },
-  purchases: {
-    expectedData: [80, 100, 121, 104, 105, 90, 100],
-    actualData: [120, 90, 100, 138, 142, 130, 130]
-  },
-  shoppings: {
-    expectedData: [130, 140, 141, 142, 145, 150, 160],
-    actualData: [120, 82, 91, 154, 162, 140, 130]
-  }
-}
+
 
 export default {
   name: 'Dashboard',
@@ -157,12 +141,39 @@ export default {
   data() {
     return {
       doctor_name: "Jerry",
+      processing: null,
+      waiting: null,
+      finished: null,
+      total: null,
       date: new Date().toUTCString(),
       end_people_value: 10,
       end_time_value: 50,
     }
   },
   created() {
+    let data = new FormData
+    data.append("doc_id", 2)
+    request({
+      url: "/get_doc_dashboard",
+      method: 'post',
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      data
+    })
+    .then(res => {
+      let data_list = res.data
+      console.log(data_list)
+      this.doctor_name = data_list['name']
+      this.processing = data_list['processing']
+      this.waiting = data_list['waiting']
+      this.finished = data_list['finished']
+      this.total = data_list['total']
+      /* this.name = data_list['name']
+      this.people = data_list['people']
+      this.time = data_list['time'] */
+      //console.log(res.data)
+    })
     let _this = this; // 声明一个变量指向Vue实例this，保证作用域一致
     this.timer = setInterval(() => {
       _this.date = new Date().toUTCString(); // 修改数据date
