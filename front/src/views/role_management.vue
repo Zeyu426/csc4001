@@ -75,7 +75,7 @@
       <el-table-column align="center" label="Change" width="200">
         <template slot-scope="scope">
           <el-button type="primary" 
-            @click="handleClick(scope.row.id)"
+            @click="handleClick(scope.row)"
             :disabled="scope.row.unchange">
             Submit
           </el-button>
@@ -88,6 +88,7 @@
 
 <script>
 // import { getList } from '@/api/table'
+import request from '@/utils/request'
 
 export default {
   filters: {
@@ -121,26 +122,54 @@ export default {
         }
       ],
       // checkList: ['选中且禁用','复选框 A'],
-      privilegeOptions: ['CT', 'Doctor']
+      privilegeOptions: ['dashboard', 'dash', 'CT', 'profile', 'patient_list2', 'role_management']
     }
   },
   created() {
     this.fetchData()
   },
   methods: {
-    handleClick(id) {
-      console.log(id)
+    handleClick(row) {
+      // console.log(id)
       // this.$router.push({name: 'Workbench', query: {conlltion: id}})
-      for (var i = 0; i < this.table_data.length; i++){
-        if (this.table_data[i]['id'] == id){
-          this.table_data[i]['unchange'] = true
-          break
+      console.log(row['id'])
+      console.log(row['privilege'].toString())
+      request({
+        url: '/update_privilege',
+        method: 'post',
+        data: {
+          'id': row['id'],
+          'privilege': row['privilege'].toString()
+        }
+      }).then( res => {
+        console.log(res)
+        if (res.code == 20000){
+          this.$alert("Submit successfully.")
+        }
+        else{
+          this.$alert("Error in Submition")
         }
       }
+      )
+      // for (var i = 0; i < this.table_data.length; i++){
+      //   if (this.table_data[i]['id'] == id){
+      //     console.log(this.table_data[i]['privilege'])
+      //     this.table_data[i]['unchange'] = true
+      //     break
+      //   }
+      // }
     },
     fetchData() {
       this.listLoading = true
-      this.list = this.table_data
+      // this.list = this.table_data
+      request({
+        url: '/get_user_list',
+        method: 'post'
+      }).then(res => {
+        // console.log(res.data)
+        this.list = res.data
+      })
+      // console.log(this.list)
       this.listLoading = false
       /* getList().then(response => {
         this.list = response.data.items
