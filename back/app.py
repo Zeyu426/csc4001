@@ -553,13 +553,14 @@ def arrange_appointment():
             app_id = result[0][0]+1
 
         time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        sql = f'''insert into Appointment values({app_id},{patient_id},{outdoc_id},"{time}","","","","","processing")'''
+        sql = f'''insert into Appointment values({app_id},{patient_id},{outdoc_id},"{time}","","processing")'''
         print(sql)
         SQL_update(sql)
 
         # return the app_id and the number of appointment he has to wait
         sql = f'''select count(*) from Appointment where outdoc_id = {outdoc_id} and status = "processing"'''
         result = SQL_query(sql)
+        print(result)
         waiting = result[0][0] - 1
         return_data['data']['app_id'] = app_id
         return_data['data']['waiting'] = waiting
