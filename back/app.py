@@ -217,7 +217,7 @@ def get_CT_list():
     #Fetch data
     sql = f'''select p.patient_id, p.name, p.birthDate, p.gender, a.sickness, c.status
             from CT c join Appointment a on c.app_id = a.app_id join Patient p on a.patient_id = p.patient_id
-            where radio_id = {radio_id}
+            where radio_id = {radio_id} and c.status = "waiting"
             order by c.status'''
     result = SQL_query(sql)
     
