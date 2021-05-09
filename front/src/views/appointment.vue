@@ -21,11 +21,11 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Gender" width="80" align="center">
+      <!-- <el-table-column label="Gender" width="80" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.gender }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
 
       <el-table-column label="Department" width="240" align="center">
         <template slot-scope="scope">
