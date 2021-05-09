@@ -545,7 +545,7 @@ def arrange_appointment():
         # {'app_id': , 'waiting': }
         # find the app_id for the new appointment
         # if there is no CT created before, make this the first one.
-        result = SQL_query('select max(app_id) from appointment')
+        result = SQL_query('select max(app_id) from Appointment')
         app_id = 1
         if type(result[0][0])!=int:
             pass
