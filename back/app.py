@@ -482,13 +482,70 @@ def get_user_list():
         'code': 20000,
         'data': {}
     }
-    #{'id': , 'role': "", 'privilege': ""}
+    #{0: {'role': "", 'privilege': ""} ,
+    # 1: {'role': "", 'privilege': ""} ,
+    # 2: {'role': "", 'privilege': ""} ,}
     sql = f'''select id, identity, privilege from Account'''
     result = SQL_query(sql)
     for i in result:
         return_data['data'][i[0]] = {}
         return_data['data'][i[0]]['role'] = i[1]
         return_data['data'][i[0]]['privilege'] = i[2]
+    return make_response(jsonify(return_data))
+
+@app.route('/get_appointment_list', methods=['GET','POST'])
+def get_appointment_list():
+    return_data = {
+        'code': 20000,
+        'data': {}
+    }
+    #{0: {'role': "", 'privilege': ""} ,
+    # 1: {'role': "", 'privilege': ""} ,
+    # 2: {'role': "", 'privilege': ""} ,}
+    sql = f'''select outdoc_id, name, gender, department, office, title, specialty, outdoc_status from Out_doctor order by outdoc_status'''
+    result = SQL_query(sql)
+    for i in result:
+        return_data['data'][i[0]] = {}
+        return_data['data'][i[0]]['name'] = i[1]
+        return_data['data'][i[0]]['gender'] = i[2]
+        return_data['data'][i[0]]['department'] = i[3]
+        return_data['data'][i[0]]['office'] = i[4]
+        return_data['data'][i[0]]['title'] = i[5]
+        return_data['data'][i[0]]['specialty'] = i[6]
+        return_data['data'][i[0]]['status'] = i[7]
+    return make_response(jsonify(return_data))
+
+@app.route('/arrange_appointment', methods=['GET','POST'])
+def arrange_appointment():
+    return_data = {
+        'code': 20000,
+        'data': {}
+    }
+    patient_id = request.form.get("patient_id")
+    outdoc_id = request.form.get("outdoc_id")
+
+    #check whether there is a processing appointment for the patient
+    sql = f'''select count(*) from Appointment where patient_id = {patient_id} and status = "processing"'''
+    result = SQL_query(sql)
+    if result[0][0] != 0:
+        return_data = {
+            'code': 00000,
+            'message': "You are currently in a processing appointment. You may not make a new one before the current one finishes"
+        }
+    else:
+        # find the app_id for the new appointment
+        # if there is no CT created before, make this the first one.
+        result = SQL_query('select max(CT_id) from CT')
+        app_id = 1
+        if type(result[0][0])!=int:
+            pass
+        else:
+            app_id = result[0][0]+1
+
+        time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        sql = f'''insert into Appointment values({app_id},{patient_id},{outdoc_id},"{time}","","","","","processing")'''
+        SQL_update(sql)
+        
     return make_response(jsonify(return_data))
 
 if __name__ == "__main__":
