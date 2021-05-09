@@ -273,7 +273,7 @@ def get_main_list():
     '333': {}
     }'''
     sql = f'''select p.patient_id, p.name, p.birthDate, p.gender, a.sickness, c.status, report
-            from CT c join Appointment a on c.app_id = a.app_id join Patient p on a.patient_id = p.patient_id
+            from CT c right outer join Appointment a on c.app_id = a.app_id join Patient p on a.patient_id = p.patient_id
             where outdoc_id = {out_doc_id} and a.status = "processing"
             order by c.status  '''
     result = SQL_query(sql)
@@ -545,7 +545,7 @@ def arrange_appointment():
         # {'app_id': , 'waiting': }
         # find the app_id for the new appointment
         # if there is no CT created before, make this the first one.
-        result = SQL_query('select max(app_id) from appointment')
+        result = SQL_query('select max(app_id) from Appointment')
         app_id = 1
         if type(result[0][0])!=int:
             pass
