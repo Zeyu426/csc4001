@@ -540,9 +540,10 @@ def arrange_appointment():
             'message': "You are currently in a processing appointment. You may not make a new one before the current one finishes"
         }
     else:
+        # {'app_id': , 'waiting': }
         # find the app_id for the new appointment
         # if there is no CT created before, make this the first one.
-        result = SQL_query('select max(CT_id) from CT')
+        result = SQL_query('select max(app_id) from appointment')
         app_id = 1
         if type(result[0][0])!=int:
             pass
@@ -552,7 +553,14 @@ def arrange_appointment():
         time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         sql = f'''insert into Appointment values({app_id},{patient_id},{outdoc_id},"{time}","","","","","processing")'''
         SQL_update(sql)
-        
+
+        # return the app_id and the number of appointment he has to wait
+        sql = f'''select count(*) from Appointment where outdoc_id = {outdoc_id} and status = "processing"'''
+        result = SQL_query(sql)
+        waiting = result[0][0] - 1
+        return_data['data']['app_id'] = app_id
+        return_data['data']['waiting'] = waiting
+
     return make_response(jsonify(return_data))
 
 if __name__ == "__main__":
