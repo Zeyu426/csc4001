@@ -8,6 +8,7 @@ from flask import (abort, current_app, jsonify,
 import csv
 import pymysql
 import json
+import datetime
 
 DATA_FILE = "./data.csv"
 
@@ -223,7 +224,7 @@ def get_CT_list():
     for i in result:
         return_data['data'][i[0]] = {}
         return_data['data'][i[0]]["name"] = i[1]
-        return_data['data'][i[0]]["birthDate"] = i[2]
+        return_data['data'][i[0]]["birthDate"] = i[2].strftime("%Y-%m-%d")
         return_data['data'][i[0]]["gender"] = i[3]
         return_data['data'][i[0]]["sickness"] = i[4]
         return_data['data'][i[0]]["status"] = i[5]
