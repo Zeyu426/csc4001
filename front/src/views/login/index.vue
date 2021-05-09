@@ -44,8 +44,19 @@
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
 
       <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
+        <span style="margin-right:51px;"> Role: super_admin </span>
+        <span style="margin-right:25px;"> Username: 0 </span>
+        <span> Password: 1234567 </span><br/>
+        <span style="margin-right:68px;"> Role: radiologist </span>
+        <span style="margin-right:25px;"> Username: 1 </span>
+        <span> Password: 1234567 </span><br/>
+        <span style="margin-right:27px;"> Role: outpatient doctor </span>
+        <span style="margin-right:25px;"> Username: 2 </span>
+        <span> Password: 1234567 </span><br/>
+        <span style="margin-right:90px;"> Role: patient </span>
+        <span style="margin-right:25px;"> Username: 3 </span>
+        <span> Password: 1234567 </span><br/>
+
       </div>
 
     </el-form>
@@ -74,8 +85,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: '',
+        password: ''
       },
       loginRules: {
         //username: [{ required: true, trigger: 'blur', validator: validateUsername }],
