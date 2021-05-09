@@ -124,6 +124,15 @@
         </el-input>
       </div>
     </el-dialog>
+
+    <div class="message">
+      <el-dialog class="message" title="" :visible.sync="dialogVisible">
+        <div class="button">
+          <h1> Succeed! </h1>
+          <el-button type="primary" @click="handleClick4">Confirm</el-button>
+        </div>
+      </el-dialog>
+    </div>
   </div>
 </template>
 
@@ -147,6 +156,7 @@ export default {
       list: null,
       listLoading: true,
       dialogTableVisible: false,
+      dialogVisible: false,
       textarea2: "w2w2wqd",
       table_data: [],
       /* table_data: [{'id': 1234, 'name': 'fugui', 'birthdate': '2020-01-01', 'gender': 'female', 'status': 'waiting', 'sickness': null, 'originalSickness': null, 'edit': false, 'hasReport': false},
@@ -254,7 +264,12 @@ export default {
         data
       })
       .then(res => {
+        this.dialogVisible = true
       })
+      
+    },
+    handleClick4() {
+      location.reload()
     },
     fetchData() {
       this.listLoading = true
@@ -272,3 +287,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.message {
+  margin: 0 auto;
+  width: 600px;
+  text-align: center;
+}
+</style>
