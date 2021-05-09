@@ -273,7 +273,7 @@ def get_main_list():
     '333': {}
     }'''
     sql = f'''select p.patient_id, p.name, p.birthDate, p.gender, a.sickness, c.status, report
-            from CT c join Appointment a on c.app_id = a.app_id join Patient p on a.patient_id = p.patient_id
+            from CT c right outer join Appointment a on c.app_id = a.app_id join Patient p on a.patient_id = p.patient_id
             where outdoc_id = {out_doc_id} and a.status = "processing"
             order by c.status  '''
     result = SQL_query(sql)
