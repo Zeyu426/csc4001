@@ -138,8 +138,8 @@ def test2():
             'menus': []
         }
     }
-
     for page in token:
+        print(page)
         return_data['data']['menus'].append(ROUTE[page])
     return make_response(jsonify(return_data))
 
@@ -530,9 +530,11 @@ def arrange_appointment():
     }
     patient_id = request.form.get("patient_id")
     outdoc_id = request.form.get("outdoc_id")
+    print(patient_id, outdoc_id)
 
     #check whether there is a processing appointment for the patient
     sql = f'''select count(*) from Appointment where patient_id = {patient_id} and status = "processing"'''
+    print(sql)
     result = SQL_query(sql)
     if result[0][0] != 0:
         return_data = {
@@ -552,6 +554,7 @@ def arrange_appointment():
 
         time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         sql = f'''insert into Appointment values({app_id},{patient_id},{outdoc_id},"{time}","","","","","processing")'''
+        print(sql)
         SQL_update(sql)
 
         # return the app_id and the number of appointment he has to wait

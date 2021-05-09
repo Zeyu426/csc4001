@@ -18,14 +18,14 @@
     "dash": {
         "path": "/",
         "component": "Layout",
-        "redirect": "/dash",
+        "redirect": "/dashboard",
         "children": [
             {
-                "path": "dash",
-                "name": "Dash",
+                "path": "dashboard",
+                "name": "Dashboard",
                 "component": "dash",
                 "meta": {
-                    "title": "Dash",
+                    "title": "Dashboard",
                     "icon": "dashboard"
                 }
             }
@@ -109,6 +109,22 @@
                 "component": "role_management",
                 "meta": {
                     "title": "Role Management",
+                    "icon": "form"
+                }
+            }
+        ]
+    },
+    "appointment": {
+        "path": "/appointment",
+        "component": "Layout",
+        "redirect": "/appointment/app",
+        "children": [
+            {
+                "path": "app",
+                "name": "Appointment",
+                "component": "appointment",
+                "meta": {
+                    "title": "Appointment",
                     "icon": "form"
                 }
             }

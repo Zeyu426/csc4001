@@ -122,7 +122,7 @@ export default {
         }
       ],
       // checkList: ['选中且禁用','复选框 A'],
-      privilegeOptions: ['dashboard', 'dash', 'CT', 'profile', 'patient_list2', 'role_management']
+      privilegeOptions: ['dashboard', 'dash', 'CT', 'profile', 'patient_list2', 'role_management', 'appointment']
     }
   },
   created() {

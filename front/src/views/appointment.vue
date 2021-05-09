@@ -15,27 +15,33 @@
         </template>
       </el-table-column> -->
 
-      <el-table-column label="Name" width="110" align="center">
+      <el-table-column label="Name" width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row.name }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Department" width="110" align="center">
+      <el-table-column label="Gender" width="80" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.gender }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Title" width="110" align="center">
+      <el-table-column label="Department" width="240" align="center">
         <template slot-scope="scope">
-          {{ scope.row.gender }}
+          <span>{{ scope.row.department }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Title" width="180" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.title }}
         </template>
       </el-table-column>
 
       <el-table-column label="Specialty" width="110" align="center">
         <template slot-scope="scope">
-          {{ scope.row.sickness }}
+          {{ scope.row.specialty }}
         </template>
       </el-table-column>
 
@@ -67,8 +73,8 @@ export default {
   filters: {
     statusFilter(status) {
       const statusMap = {
-        finished: 'success',
-        waiting: 'gray'
+        available: 'success',
+        full: 'info'
         //deleted: 'danger'
       }
       return statusMap[status]
@@ -85,25 +91,34 @@ export default {
     }
   },
   created() {
-    this.doc_id = this.$store.getters.id
-    console.log(this.doc_id)
-    let data = new FormData
+    // this.doc_id = this.$store.getters.id
+    // console.log(this.doc_id)
+    // let data = new FormData
     //data.append("radio_id", this.doc_id)
-    data.append("radio_id", 1)
+    // data.append("radio_id", 1)
 
     request({
-      url: "/get_CT_list",
+      url: "/get_appointment_list",
       method: 'post',
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      },
-      data
+      // headers: {
+      //   'Content-Type': 'multipart/form-data'
+      // },
+      // data
     })
     .then(res => {
       let data_list = res.data
       //let dic = {}
       for (var key in res.data) {
-        let dic = {'id': key, 'name': data_list[key]['name'], 'birthdate': data_list[key]['birthDate'], 'gender': data_list[key]['gender'], 'status': data_list[key]['status'], 'sickness': data_list[key]['sickness']}
+        let dic = {
+          'id': key,
+          'name': data_list[key]['name'], 
+          'gender': data_list[key]['gender'], 
+          'department': data_list[key]['department'], 
+          'office': data_list[key]['office'], 
+          'title': data_list[key]['title'],
+          'specialty': data_list[key]['specialty'],
+          'status': data_list[key]['status']
+          }
         this.table_data.push(dic)
       }
       /* console.log(this.table_data)
@@ -117,20 +132,60 @@ export default {
   },
   methods: {
     handleClick(id) {
-      this.$router.push({name: 'Workbench', query: {conlltion: id}})
+        // this.$router.push({name: 'Workbench', query: {conlltion: id}})
+      this.patient_id = this.$store.getters.id
+      // console.log(this.doc_id)
+      let data = new FormData
+      //data.append("radio_id", this.doc_id)
+      data.append("patient_id", this.patient_id)
+      data.append("outdoc_id", id)
+
+      request({
+        url: "/arrange_appointment",
+        method: 'post',
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        data
+      })
+      .then(res => {
+        if (res.code == 20000){
+          var app_id = res.data.app_id
+          var waiting = res.data.waiting
+          this.$alert("Success! Your appointment id is: " + app_id)
+        }
+        else{
+          this.$alert("Fail")
+        }
+        // let data_list = res.data
+        // //let dic = {}
+        // for (var key in res.data) {
+        //   let dic = {
+        //     'id': key,
+        //     'name': data_list[key]['name'], 
+        //     'gender': data_list[key]['gender'], 
+        //     'department': data_list[key]['department'], 
+        //     'office': data_list[key]['office'], 
+        //     'title': data_list[key]['title'],
+        //     'specialty': data_list[key]['specialty'],
+        //     'status': data_list[key]['status']
+        //     }
+        //   this.table_data.push(dic)
+        // }
+      })
     },
     fetchData() {
-      this.listLoading = true
-      this.list = this.table_data
-      this.listLoading = false
-      /* getList().then(response => {
-        this.list = response.data.items
+        this.listLoading = true
         this.list = this.table_data
-        console.log(this.list)
         this.listLoading = false
-      }) */
+        /* getList().then(response => {
+          this.list = response.data.items
+          this.list = this.table_data
+          console.log(this.list)
+          this.listLoading = false
+        }) */
 
-      //
+        //
     }
   }
 }
