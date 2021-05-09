@@ -52,6 +52,10 @@
       <el-input
         class="input2"
         type="textarea"
+        v-loading="loading"
+        element-loading-text="拼命加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
         :autosize="{ minRows: 10, maxRows: 20}"
         placeholder="Please Enter:"
         v-model="report">
@@ -92,6 +96,8 @@ export default {
       report: "",
       patient_id: null,
       localUrl: null,
+      data: new FormData,
+      loading: null,
     }
   },
   mounted() {
@@ -100,7 +106,22 @@ export default {
   },
   methods: {
     handleClick() {
-
+      let data = this.data
+      this.loading = true
+      request({
+        url: "/upload_image",
+        method: 'post',
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        timeout: 60000,
+        data
+      })
+      .then(res => {
+        this.report = res.data['report']
+        this.loading = false
+        console.log(res.data)
+      })
     },
     handleClick2() {
       let data = new FormData
@@ -139,12 +160,13 @@ export default {
       console.log(file)
       console.log(URL.createObjectURL(file.raw))
       this.localUrl = URL.createObjectURL(file.raw)
-      let data = new FormData
-      data.append("file", file.raw)
-      data.append("name", "111")
-      data.append("description", "222")
+      //let data = new FormData
+      this.data.append("file", file.raw)
+      this.data.append("name", "111")
+      this.data.append("description", "222")
+      //this.data = Object.assign({},data)
 
-      request({
+      /* request({
         url: "/upload_image",
         method: 'post',
         headers: {
@@ -154,7 +176,7 @@ export default {
       })
       .then(res => {
         console.log(res)
-      })
+      }) */
     },
     handleChange(file,fileList) {
       /* var arr = [];
