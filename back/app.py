@@ -469,10 +469,10 @@ def update_privilege():
         'code': 20000,
         'data': {}
     }
-    id_ = request.form.get("id")
-    privilege = request.form.get("privilege")
-
-    sql = f'''update Account set privilege = "{privilege}"" where id = {id_}'''
+    data = request.get_json(silent=True)
+    id_ = data['id']
+    privilege = data['privilege']
+    sql = f'''update Account set privilege = "{privilege}" where id = {id_}'''
     SQL_update(sql)
     return make_response(jsonify(return_data))
 
@@ -480,7 +480,7 @@ def update_privilege():
 def get_user_list():
     return_data = {
         'code': 20000,
-        'data': {}
+        'data': []
     }
     #{0: {'role': "", 'privilege': ""} ,
     # 1: {'role': "", 'privilege': ""} ,
@@ -488,9 +488,16 @@ def get_user_list():
     sql = f'''select id, identity, privilege from Account'''
     result = SQL_query(sql)
     for i in result:
-        return_data['data'][i[0]] = {}
-        return_data['data'][i[0]]['role'] = i[1]
-        return_data['data'][i[0]]['privilege'] = i[2]
+        return_data['data'].append({
+            'id': i[0],
+            'name': 'doctor',
+            'roles': i[1],
+            'privilege': i[2].split(','),
+            'unchange': True
+        })
+        # return_data['data'][i[0]] = {}
+        # return_data['data'][i[0]]['role'] = i[1]
+        # return_data['data'][i[0]]['privilege'] = i[2]
     return make_response(jsonify(return_data))
 
 @app.route('/get_appointment_list', methods=['GET','POST'])
