@@ -417,8 +417,7 @@ def get_patient_dashboard():
         return_data['data']['people'] = ""
         return_data['data']['time'] = ""
     else:
-        name = result[0][0]
-        CT_id = result[0][1]
+        CT_id = result[0][0]
         sql = f'''select count(CT_id) from CT where CT_id < {CT_id} and status = "waiting"'''
         result = SQL_query(sql)
         return_data['data']['name'] = name
