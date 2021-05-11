@@ -406,14 +406,16 @@ def get_patient_dashboard():
     patient_id = request.form.get("patient_id")
     ''' 有几个人在CT表中先于这个人，等待时间为5*前面的人数 '''
     ''' {'name': '', 'people': '', 'time': ''}'''
+    #find the patient's name
+    result = SQL_query(f'''select name from Patient where patient_id = {patient_id}''')
+    name = result[0][0]
     #find the patient's CT_id
-    sql = f'''select name, CT_id from CT c join Appointment a on c.app_id = a.app_id join Patient where a.patient_id = {patient_id} and c.status = "waiting"'''
+    sql = f'''select CT_id from CT c join Appointment a on c.app_id = a.app_id join Patient where a.patient_id = {patient_id} and c.status = "waiting"'''
     result = SQL_query(sql)
     if len(result)==0:
-        return_data = {
-            'code': 00000,
-            'message': "Cannot find the patient's CT order"
-        }
+        return_data['data']['name'] = name
+        return_data['data']['people'] = ""
+        return_data['data']['time'] = ""
     else:
         name = result[0][0]
         CT_id = result[0][1]
@@ -422,6 +424,36 @@ def get_patient_dashboard():
         return_data['data']['name'] = name
         return_data['data']['people'] = result[0][0]
         return_data['data']['time'] = result[0][0]*5
+    return make_response(jsonify(return_data))
+
+@app.route('/get_patient_dashboard2', methods=['GET','POST'])
+def get_patient_dashboard2():
+    return_data = {
+        'code': 20000,
+        'data': {}
+    }
+    patient_id = request.form.get("patient_id")
+    ''' 有几个人挂他的医生的号在他前面，等待时间为10*前面的人数 '''
+    ''' {'name': '', 'people': '', 'time': ''}'''
+    #find the patient's name
+    result = SQL_query(f'''select name from Patient where patient_id = {patient_id}''')
+    name = result[0][0]
+    #find the patient's doctor and his app_id
+    sql = f'''select app_id, outdoc_id from Appointment where patient_id = {patient_id} and status = "processing"'''
+    result = SQL_query(sql)
+    if len(result) != 2:
+        return_data['data']['name'] = name
+        return_data['data']['people'] = ""
+        return_data['data']['time'] = ""
+    else:
+        app_id = result[0][0]
+        outdoc_id = result[0][1]
+        sql = f'''select count(*) from Appointment where outdoc_id = {outdoc_id} and app_id <{app_id} and status = "processing"'''
+        result = SQL_query(sql)
+        people = result[0][0]
+        return_data['data']['name'] = name
+        return_data['data']['people'] = people
+        return_data['data']['time'] = people*5
     return make_response(jsonify(return_data))
 
 
