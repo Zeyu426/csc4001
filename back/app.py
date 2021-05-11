@@ -25,8 +25,12 @@ def SQL_query(sql):
                     passwd = "123456", 
                     database = "Hospital")
     cur = conn.cursor()
-    cur.execute(sql)
-    result = cur.fetchall()
+    try:
+        cur.execute(sql)
+        result = cur.fetchall()
+    except:
+        print('something wrong with the SQL query')
+        result = ()
     cur.close()
     conn.close()
     return result
@@ -37,10 +41,19 @@ def SQL_update(sql):
                     passwd = "123456", 
                     database = "Hospital")
     cur = conn.cursor()
-    cur.execute(sql)
-    conn.commit()
+    try:
+        cur.execute(sql)
+        conn.commit()
+    except:
+        print('something wrong with the SQL update')
     cur.close()
     conn.close()
+    return 
+
+def sanitize_text(text):
+    text.replace("'","\\'")
+    text.replace('\\"','\\"')
+    return text
 
 @app.route('/', methods=["GET"])
 def index():
@@ -88,20 +101,25 @@ def upload_image():
 @app.route('/api/user/login', methods=['GET','POST'])
 def login_test():
     data = request.get_json(silent=True)
-    username = data['username']
+    username = sanitize_text(data['username'])
     password = data['password']
 
     sql = f"SELECT * from Account WHERE id = '{username}'"
     df = SQL_query(sql)
 
-    if len(df) == 0:
+    if username.isdigit() == False:
+        return_data = {
+            'code': 60003, # Username has to be all digits
+            'message': 'Username has to be all digits'
+        }
+    elif len(df) == 0:
         return_data = {
             'code': 60001, # unknown user
             'message': 'Unknown User'
         }
     elif df[0][0] != password:
         return_data = {
-            'code': 60002, # unknown user
+            'code': 60002, # unknown password
             'message': 'Invalid Password'
         }
     else:
@@ -111,6 +129,7 @@ def login_test():
                 'token': df[0][3]
             }
         }
+    print(username, password)
     # return_data = {
     #     "code": 20000,
     #     "data": {
@@ -156,7 +175,7 @@ def test3():
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     data = request.get_json(silent=True)
-    username = data['username']
+    username = sanitize_text(data['username'])
     password = data['password']
     print(username, password)
     return_data = get_login(username, password)
@@ -237,7 +256,8 @@ def generate_CT_report(): """
 @app.route('/upload_CT_report', methods=['GET','POST'])
 def upload_CT_report():
     patient_id = request.form.get("patient_id")
-    report = request.form.get("report")
+    report = sanitize_text(request.form.get("report"))
+    print(report)
     ''' 通过sql将报告存入CT '''
     SQL_update(f'''update CT c inner join Appointment a on c.app_id = a.app_id set report = "{report}", c.status = "finished" 
     where patient_id = {patient_id} and c.status = "waiting"''')
@@ -251,7 +271,8 @@ def upload_CT_report():
 @app.route('/upload_sickness', methods=['GET','POST'])
 def upload_sickness():
     patient_id = request.form.get("patient_id")
-    sickness = request.form.get("sickness")
+    sickness = sanitize_text(request.form.get("sickness"))
+    print(sickness)
     ''' 通过sql将sickness存入Appointment '''
     SQL_update(f'''update Appointment set sickness = "{sickness}" where patient_id = {patient_id} and status = "processing"''')
     return_data = {
