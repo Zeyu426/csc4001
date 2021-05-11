@@ -2,7 +2,7 @@
   <div class="all">
     <div class="page">
 
-      <div>
+      <div style="margin: 20px">
         <h1 class="one"> Hello, {{name}}!</h1>
       </div>
       
@@ -23,36 +23,75 @@
         </el-col>
         
       </el-row> -->
-
-      <div class="panel-group hello">
-        <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
-          <div class="card-panel-icon-wrapper icon-people">
-            <i class="el-icon-user-solid card-panel-icon"></i>
-            <!-- svg-icon icon-class="people" /> -->
-          </div>
-          <div class="card-panel-description">
-            <div class="card-panel-text">
-              Waiting for
+      <el-card style="width:60%; margin-left: 20% ">
+        <div slot="header" class="clearfix">
+          <h3> Waiting for Doctor </h3>
+        </div>
+        <div class="panel-group hello">
+          <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
+            <div class="card-panel-icon-wrapper icon-people">
+              <i class="el-icon-user-solid card-panel-icon"></i>
+              <!-- svg-icon icon-class="people" /> -->
             </div>
-            <count-to :start-val="0" :end-val="people" :duration="1000" class="card-panel-num" />
+            <div class="card-panel-description">
+              <div class="card-panel-text">
+                Waiting for Doctor
+              </div>
+              <count-to :start-val="0" :end-val="d_people" :duration="1000" class="card-panel-num" />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="panel-group hello">
-        <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
-          <div class="card-panel-icon-wrapper icon-people">
-            <i class="el-icon-time card-panel-icon"></i>
-            <!-- svg-icon icon-class="people" /> -->
-          </div>
-          <div class="card-panel-description">
-            <div class="card-panel-text">
-              Waiting for
+        <div class="panel-group hello">
+          <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
+            <div class="card-panel-icon-wrapper icon-people">
+              <i class="el-icon-time card-panel-icon"></i>
+              <!-- svg-icon icon-class="people" /> -->
             </div>
-            <count-to :start-val="0" :end-val="time" :duration="1000" class="card-panel-num" />
+            <div class="card-panel-description">
+              <div class="card-panel-text">
+                Waiting Time (min)
+              </div>
+              <count-to :start-val="0" :end-val="d_time" :duration="1000" class="card-panel-num" />
+            </div>
           </div>
         </div>
-      </div>
+      </el-card>
+      
+      <el-card style="width:60%; margin-left: 20% ">
+        <div slot="header" class="clearfix">
+          <h3> Waiting for CT </h3>
+        </div>
+        <div class="panel-group hello">
+          <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
+            <div class="card-panel-icon-wrapper icon-people">
+              <i class="el-icon-user-solid card-panel-icon"></i>
+              <!-- svg-icon icon-class="people" /> -->
+            </div>
+            <div class="card-panel-description">
+              <div class="card-panel-text">
+                Waiting for CT
+              </div>
+              <count-to :start-val="0" :end-val="people" :duration="1000" class="card-panel-num" />
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-group hello">
+          <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
+            <div class="card-panel-icon-wrapper icon-people">
+              <i class="el-icon-time card-panel-icon"></i>
+              <!-- svg-icon icon-class="people" /> -->
+            </div>
+            <div class="card-panel-description">
+              <div class="card-panel-text">
+                Waiting time (min)
+              </div>
+              <count-to :start-val="0" :end-val="time" :duration="1000" class="card-panel-num" />
+            </div>
+          </div>
+        </div>
+      </el-card>
       <!-- <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
         <div class="card-panel-icon-wrapper icon-people">
           <svg-icon icon-class="peoples" class-name="card-panel-icon" />
@@ -83,6 +122,8 @@ export default {
   data() {
     return {
       name: "Jerry",
+      d_people: null,
+      d_time: null,
       people: null,
       time: null,
       date: new Date().toUTCString(),
@@ -108,6 +149,21 @@ export default {
       this.time = data_list['time']
       //console.log(res.data)
     })
+    request({
+      url: "/get_patient_dashboard2",
+      method: 'post',
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      data
+    })
+    .then(res => {
+      let data_list = res.data
+      // this.name = data_list['name']
+      this.d_people = data_list['people']
+      this.d_time = data_list['time']
+      //console.log(res.data)
+    })
   },
   beforeDestroy() {
     if (this.timer) {
@@ -128,7 +184,7 @@ export default {
 <style lang="scss" scoped>
 .all {
   background-color: rgb(240, 242, 245);
-  height: 800px;
+  height: 1000px;
 }
 .hello {
   width: 300px;
@@ -144,7 +200,7 @@ export default {
   /* width: 600px;
   height: 300px; */
   margin: 0 auto;
-  top: 120px;
+  top: 80px;
   width: 90%;
   text-align: center;
   background-color: rgb(240, 242, 245);
