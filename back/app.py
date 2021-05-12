@@ -29,7 +29,7 @@ def SQL_query(sql):
         cur.execute(sql)
         result = cur.fetchall()
     except:
-        print('something wrong with the SQL query')
+        print('something wrong with the SQL query:', sql)
         result = ()
     cur.close()
     conn.close()
@@ -45,7 +45,7 @@ def SQL_update(sql):
         cur.execute(sql)
         conn.commit()
     except:
-        print('something wrong with the SQL update')
+        print('something wrong with the SQL update', sql)
     cur.close()
     conn.close()
     return 
@@ -273,7 +273,7 @@ def upload_sickness():
     patient_id = request.form.get("patient_id")
     sickness = sanitize_text(request.form.get("sickness"))
     print(sickness)
-    ''' 通过sql将sickness存入Appointment '''
+    ''' using sql to update sickness into Appointment '''
     SQL_update(f'''update Appointment set sickness = "{sickness}" where patient_id = {patient_id} and status = "processing"''')
     return_data = {
         'code': 20000,
@@ -323,7 +323,7 @@ def arrange_CT():
     if result[0][0]!=0:
         return_data = {
             'code': 00000,
-            'message': "Error: cannot create a new CT order when the previous one has not finished"
+            'message': "Cannot create a new CT order when the previous one has not finished"
         }
     else:
         # find CT_id for the new CT
@@ -352,15 +352,24 @@ def arrange_CT():
 ''' 在appoingment里把status改为finished '''
 @app.route('/finish_appointment', methods=['GET','POST'])
 def finish_appointment():
-    patient_id = request.form.get("patient_id")
-    sql = f'''update Appointment a inner join Patient p on a.patient_id = p.patient_id set status = "finished" 
-    where status = "processing" and p.patient_id = {patient_id}'''
-    SQL_update(sql)
-
     return_data = {
         'code': 20000,
-        'data': {'patient_id': patient_id}
+        'data': {}
     }
+    patient_id = request.form.get("patient_id")
+    sql = f'''select CT_id, a.app_id from CT c join Appointment a on c.app_id = a.app_id where patient_id = {patient_id} and c.status = "waiting"'''
+    result = SQL_query(sql)
+    if len(result) > 0:
+        return_data = {
+            'code': 00000,
+            'message': "Cannot finish appointment. Please wait till the patient's CT scan finishes"
+        }
+    else:
+        app_id = result[0][0]
+        sql = f'''update Appointment set status = "finished" where app_id = {app_id}'''
+        SQL_update(sql)
+        return_data['data'] = {'patient_id': patient_id}
+    print(return_data)
     return make_response(jsonify(return_data))
 
 @app.route('/get_CT_doctor_profile', methods=['GET','POST'])
@@ -540,9 +549,18 @@ def get_user_list():
     sql = f'''select id, identity, privilege from Account'''
     result = SQL_query(sql)
     for i in result:
+        id_ = i[0]
+        role = ["Patient", "Out_doctor", "Radiologist"]
+        prefix = ["patient", "outdoc", "radio"]
+        name = "super_admin"
+        for j in range(3):
+            sql = f'''select name from {role[j]} where {prefix[j]}_id = {id_}'''
+            result2 = SQL_query(sql)
+            if len(result2) != 0:
+                name = result2[0][0]
         return_data['data'].append({
             'id': i[0],
-            'name': 'doctor',
+            'name': name,
             'roles': i[1],
             'privilege': i[2].split(','),
             'unchange': True
