@@ -129,17 +129,6 @@ def login_test():
                 'token': df[0][3]
             }
         }
-    print(username, password)
-    # return_data = {
-    #     "code": 20000,
-    #     "data": {
-    #         'token':"admin-token",
-    #     }
-    # }
-    # error_return = {
-    #     'code': 12345,
-    #     'message': 'ERROR data'
-    # }
     return make_response(jsonify(return_data))
 
 
@@ -357,7 +346,7 @@ def finish_appointment():
         'data': {}
     }
     patient_id = request.form.get("patient_id")
-    sql = f'''select CT_id, a.app_id from CT c join Appointment a on c.app_id = a.app_id where patient_id = {patient_id} and c.status = "waiting"'''
+    sql = f'''select CT_id from CT c join Appointment a on c.app_id = a.app_id where patient_id = {patient_id} and c.status = "waiting"'''
     result = SQL_query(sql)
     if len(result) > 0:
         return_data = {
@@ -365,6 +354,8 @@ def finish_appointment():
             'message': "Cannot finish appointment. Please wait till the patient's CT scan finishes"
         }
     else:
+        sql = f'''select app_id from Appointment where patient_id = {patient_id} and status = "processing"'''
+        result = SQL_query(sql)
         app_id = result[0][0]
         sql = f'''update Appointment set status = "finished" where app_id = {app_id}'''
         SQL_update(sql)
