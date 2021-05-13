@@ -80,6 +80,9 @@
           </div>
         </el-col>
       </el-row>
+
+      <line-chart style="margin-top: 60px" />
+
       <!-- <div class="panel-group hello">
         <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
           <div class="card-panel-icon-wrapper icon-people">
@@ -130,13 +133,30 @@ import CountTo from 'vue-count-to'
 import PanelGroup from '../components/PanelGroup'
 import request from '@/utils/request'
 
+// import echarts from 'echarts'
+// require('echarts/theme/macarons') // echarts theme
+import LineChart from './dashboard/LineChart'
 
+// const lineChartData = {
+//   newVisitis: {
+//     expectedData: [100, 120, 161, 134, 105, 160, 165],
+//     actualData: [120, 82, 91, 154, 162, 140, 145]
+//   },
+// }
+
+const lineChartData = {
+  // newVisitis: {
+    expectedData: [100, 120, 161, 134, 105, 160, 165],
+    actualData: [120, 82, 91, 154, 162, 140, 145]
+  // },
+}
 
 export default {
   name: 'Dashboard',
   components: {
     CountTo,
-    PanelGroup
+    PanelGroup,
+    LineChart,
   },
   data() {
     return {

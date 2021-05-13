@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <h1> Apointment </h1>
+    <h1> Appointment </h1>
     <el-table
       v-loading="listLoading"
       :data="list"
